@@ -12,7 +12,7 @@ services:
       - application
 
   reverse_proxy:
-    container_name: reverse_proxy
+    container_name: markets_reverse_proxy
     image: jwilder/nginx-proxy
     ports:
       - "80:80"
