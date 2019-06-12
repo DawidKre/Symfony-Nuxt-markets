@@ -27,6 +27,5 @@ class Version00000000000000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->addSql('DROP TYPE IF EXISTS enum_unit_type');
-
     }
 }
