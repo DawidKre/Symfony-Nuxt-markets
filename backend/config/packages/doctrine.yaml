@@ -4,6 +4,11 @@ doctrine:
     driver: pdo_pgsql
     server_version: 10.8
     url: '%env(resolve:DATABASE_URL)%'
+    types:
+      enum_unit_type: App\BusinessLogic\SharedLogic\Type\EnumUnitType
+    mapping_types:
+      enum_unit_type: string
+
   orm:
     auto_generate_proxy_classes: true
     naming_strategy: doctrine.orm.naming_strategy.underscore

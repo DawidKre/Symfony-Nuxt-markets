@@ -6,7 +6,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
+use App\BusinessLogic\SharedLogic\Model\EnumTypeName;
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\MarketProductRepository")
@@ -26,7 +26,7 @@ class MarketProduct
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type=EnumTypeName::UNIT_TYPE)
      */
     private $unit;
 
