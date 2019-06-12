@@ -1,0 +1,11 @@
+types:
+  Test:
+    properties:
+      name: { nullable: false, range: "Text", ormColumn: 'type="string", nullable=false, unique=true' }
+      roles: { range: "Role", cardinality: "(1..*)"}
+
+  Role:
+    properties:
+      name: { nullable: false, range: "Text", ormColumn: 'type="string", nullable=false' }
+      score: { nullable: false, range: "Integer", ormColumn: 'type="integer", nullable=false' }
+      test: { range: "Test", cardinality: "(0..*)"}
