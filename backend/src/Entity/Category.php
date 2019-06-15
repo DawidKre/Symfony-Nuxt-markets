@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource()
+ *
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  */
 class Category
@@ -30,21 +31,35 @@ class Category
      */
     private $marketProducts;
 
+    /**
+     * Category constructor.
+     */
     public function __construct()
     {
         $this->marketProducts = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->id ;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return Category
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -60,6 +75,11 @@ class Category
         return $this->marketProducts;
     }
 
+    /**
+     * @param MarketProduct $marketProduct
+     *
+     * @return Category
+     */
     public function addMarketProduct(MarketProduct $marketProduct): self
     {
         if (!$this->marketProducts->contains($marketProduct)) {
@@ -70,6 +90,11 @@ class Category
         return $this;
     }
 
+    /**
+     * @param MarketProduct $marketProduct
+     *
+     * @return Category
+     */
     public function removeMarketProduct(MarketProduct $marketProduct): self
     {
         if ($this->marketProducts->contains($marketProduct)) {

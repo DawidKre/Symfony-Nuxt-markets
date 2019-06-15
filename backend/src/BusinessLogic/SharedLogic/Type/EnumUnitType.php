@@ -8,7 +8,7 @@ use App\BusinessLogic\SharedLogic\Model\UnitType;
 /**
  * Class EnumUnitType
  */
-class EnumUnitType extends EnumType
+class EnumUnitType extends AbstractEnumType
 {
     /** @var string  */
     protected $name = EnumTypeName::UNIT_TYPE;

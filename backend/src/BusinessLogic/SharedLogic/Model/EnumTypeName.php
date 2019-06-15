@@ -4,7 +4,10 @@ namespace App\BusinessLogic\SharedLogic\Model;
 
 use MyCLabs\Enum\Enum;
 
+/**
+ * Class EnumTypeName
+ */
 class EnumTypeName extends Enum
 {
-    const UNIT_TYPE = 'enum_unit_type';
+    public const UNIT_TYPE = 'enum_unit_type';
 }

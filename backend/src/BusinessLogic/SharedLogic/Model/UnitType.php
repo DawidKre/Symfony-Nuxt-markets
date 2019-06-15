@@ -4,17 +4,20 @@ namespace App\BusinessLogic\SharedLogic\Model;
 
 use MyCLabs\Enum\Enum;
 
+/**
+ * Class UnitType
+ */
 class UnitType extends Enum
 {
-    const KILO = 'KILO';
+    public const KILO = 'KILO';
 
-    const PIECE = 'PIECE';
+    public const PIECE = 'PIECE';
 
-    const BUNCH = 'BUNCH';
+    public const BUNCH = 'BUNCH';
 
-    const GRAMS = 'GRAMS';
+    public const GRAMS = 'GRAMS';
 
-    const LITER = 'LITER';
+    public const LITER = 'LITER';
 
-    const MILLILITERS = 'MILLILITERS';
+    public const MILLILITERS = 'MILLILITERS';
 }
