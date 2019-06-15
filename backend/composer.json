@@ -77,6 +77,7 @@
   },
   "require-dev": {
     "api-platform/schema-generator": "^2.1",
-    "symfony/maker-bundle": "^1.11",
+    "doctrine/doctrine-fixtures-bundle": "^3.2",
+    "symfony/maker-bundle": "^1.11"
   }
 }
