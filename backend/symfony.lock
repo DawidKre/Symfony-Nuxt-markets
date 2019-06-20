@@ -131,6 +131,9 @@
     "easyrdf/easyrdf": {
         "version": "0.9.1"
     },
+    "fabpot/goutte": {
+        "version": "v3.2.3"
+    },
     "facebook/webdriver": {
         "version": "1.7.0"
     },
@@ -143,14 +146,26 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "2.2",
-            "ref": "81dee417d2cc60cd1c9d6208dff2ec22a1103e93"
+            "ref": "cc05ab6abf6894bddb9bbd6a252459010ebe040b"
         },
         "files": [
             ".php_cs.dist"
         ]
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.3.3"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.5.2"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
+    },
+    "league/csv": {
+        "version": "9.2.1"
     },
     "league/html-to-markdown": {
         "version": "4.8.1"
@@ -200,11 +215,17 @@
     "psr/container": {
         "version": "1.0.0"
     },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/link": {
         "version": "1.0.0"
     },
     "psr/log": {
         "version": "1.1.0"
+    },
+    "ralouphie/getallheaders": {
+        "version": "2.0.5"
     },
     "sensio/framework-extra-bundle": {
         "version": "5.2",
@@ -216,18 +237,6 @@
         },
         "files": [
             "config/packages/sensio_framework_extra.yaml"
-        ]
-    },
-    "squizlabs/php_codesniffer": {
-        "version": "3.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "master",
-            "version": "3.0",
-            "ref": "0dc9cceda799fd3a08b96987e176a261028a3709"
-        },
-        "files": [
-            "phpcs.xml.dist"
         ]
     },
     "symfony/asset": {

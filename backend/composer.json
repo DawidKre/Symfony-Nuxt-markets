@@ -11,6 +11,8 @@
     "doctrine/annotations": "^1.0",
     "doctrine/doctrine-bundle": "^1.6",
     "doctrine/orm": "^2.4.5",
+    "fabpot/goutte": "^3.2",
+    "league/csv": "^9.2",
     "myclabs/php-enum": "^1.7",
     "nelmio/cors-bundle": "^1.5",
     "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
@@ -76,7 +78,7 @@
     }
   },
   "require-dev": {
-    "api-platform/schema-generator": "^2.1",
+    "api-platform/schema-generator": "2.1",
     "doctrine/doctrine-fixtures-bundle": "^3.2",
     "symfony/maker-bundle": "^1.11"
   }
