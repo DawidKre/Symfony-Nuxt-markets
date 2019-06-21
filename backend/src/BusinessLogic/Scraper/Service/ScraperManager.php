@@ -11,13 +11,10 @@ use App\Entity\Market;
 use ArrayIterator;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use DOMElement;
 use Exception;
 use Goutte\Client as GoutteClient;
 use GuzzleHttp\Client as GuzzleClient;
-use League\Csv\CannotInsertRecord;
 
 /**
  * Class ScraperManager
@@ -61,51 +58,110 @@ class ScraperManager
     }
 
     /**
-     * @throws CannotInsertRecord
-     * @throws Exception
+     * @throws ScraperException
      */
     public function scrapeMarkets(): void
     {
         $market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
-        $this->client->setClient($this->guzzleClient);
-        $crawler = $this->client->request('GET', $market->getPricesUrl());
-        $mainNode = $crawler->filter('#notowania');
-        $category = '';
-        $this->csvService->setHeader(new Record());
+        $scraperLog = new ScraperLog();
+        $scraperLog->setMarket($market);
 
-        foreach ($mainNode->children() as $node) {
-            if ($node->tagName === 'h2') {
-                $category = $node->textContent;
-            }
-            if ($node->tagName === 'div') {
-                foreach ($node->childNodes as $table) {
-                    foreach ($table->childNodes as $key => $tr) {
-                        if ($key > 0) {
-                            $record = $this->setRecord($tr, $market, $category);
-                            $this->csvService->addRecord($record);
+        try {
+            $this->client->setClient($this->guzzleClient);
+            $crawler = $this->client->request('GET', $market->getPricesUrl());
+            $mainNode = $crawler->filter('#notowania');
+            $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
+            $this->csvService->setHeader(new Record());
+
+            $category = '';
+            foreach ($mainNode->children() as $node) {
+                if ($node->tagName === 'h2') {
+                    $category = $node->textContent;
+                }
+                if ($node->tagName === 'div') {
+                    foreach ($node->childNodes as $table) {
+                        foreach ($table->childNodes as $key => $tr) {
+                            if ($key > 0) {
+                                $record = $this->setRecord($tr, $market, $category, $priceStartDate);
+                                $this->csvService->addRecord($record);
+                            }
                         }
                     }
                 }
             }
+
+            $file = $this->uploadFile($market->getName());
+            $scraperLog->setCsvFile($file);
+
+            $this->saveScraperLog($scraperLog, true);
+
+        } catch (Exception $e) {
+            $scraperLog->setErrorMessage($e->getMessage());
+            $this->saveScraperLog($scraperLog, false);
+
+            throw new ScraperException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @param string $priceStartDateString
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    private function getPriceStartDateFromText(string  $priceStartDateString): string
+    {
+        $stringExploded = explode(' ', $priceStartDateString);
+        $dateString = end($stringExploded);
+        $now = new DateTime();
+        $date = new DateTime($dateString);
+
+        if ($now->format('Y-m-d') === $date->format('Y-m-d')) {
+            return $now->format('Y-m-d H:i:s');
         }
 
+        return $date->format('Y-m-d H:i:s');
+    }
+    /**
+     * @param ScraperLog $scraperLog
+     * @param bool       $status
+     */
+    private function saveScraperLog(ScraperLog $scraperLog, bool $status): void
+    {
+        $scraperLog->setSuccess($status);
+
+        $this->entityManager->persist($scraperLog);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param string $marketName
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    private function uploadFile(string $marketName): string
+    {
         $date = (new DateTime())->format('Y-m-d H:i:s');
-        $fileName = $market->getName().'/import_'.$date.'.csv';
+        $fileName = $marketName.'/import_'.$date.'.csv';
         $path = $this->projectDir.'/var/storage/csv/'.$fileName;
 
-        $this->csvService->uploadCsvFile($path);
+        return $this->csvService->uploadCsvFile($path);
     }
 
     /**
      * @param DOMElement $tr
      * @param Market     $market
      * @param string     $category
+     * @param string     $priceStartDate
      *
      * @return Record
      *
      * @throws Exception
      */
-    private function setRecord(DOMElement $tr, Market $market, string $category): Record
+    private function setRecord(DOMElement $tr, Market $market, string $category, string $priceStartDate): Record
     {
         $record = new Record();
         $units = $this->convertUnits($tr->childNodes[2]->textContent);
@@ -120,6 +176,7 @@ class ScraperManager
         $record->setPriceAvg((float) $tr->childNodes[5]->textContent);
         $record->setPriceDifference((float) $tr->childNodes[6]->textContent);
         $record->setPriceAvgPrevious((float) $tr->childNodes[7]->textContent);
+        $record->setPriceStartDate($priceStartDate);
         $record->setScrapeDate((new DateTime())->format('Y-m-d H:i:s'));
 
         return $record;

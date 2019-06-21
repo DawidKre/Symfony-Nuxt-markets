@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\MarketProduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -19,32 +21,26 @@ class MarketProductRepository extends ServiceEntityRepository
         parent::__construct($registry, MarketProduct::class);
     }
 
-    // /**
-    //  * @return MarketProduct[] Returns an array of MarketProduct objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param string $name
+     *
+     * @return MarketProduct
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function findOrCreateNewByName(string $name): MarketProduct
     {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $marketProduct = $this->findOneBy(['name' => $name]);
 
-    /*
-    public function findOneBySomeField($value): ?MarketProduct
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (!$marketProduct) {
+            $marketProduct = new MarketProduct();
+            $marketProduct->setName($name);
+
+            $this->_em->persist($marketProduct);
+            $this->_em->flush();
+        }
+
+        return $marketProduct;
     }
-    */
 }

@@ -6,6 +6,8 @@ use App\Entity\Category;
 use App\Entity\Market;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Goutte\Client as GoutteClient;
 use GuzzleHttp\Client as GuzzleClient;
 use League\Csv\CannotInsertRecord;

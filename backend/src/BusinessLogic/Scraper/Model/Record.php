@@ -43,6 +43,8 @@ class Record implements RecordInterface
     /** @var string */
     private $scrapeDate;
 
+    /** @var string */
+    private $priceStartDate;
 
     /**
      * @return array
@@ -296,6 +298,27 @@ class Record implements RecordInterface
     public function setScrapeDate(string $scrapeDate): Record
     {
         $this->scrapeDate = $scrapeDate;
+
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getPriceStartDate(): string
+    {
+        return $this->priceStartDate;
+    }
+
+    /**
+     * @param string $priceStartDate
+     *
+     * @return Record
+     */
+    public function setPriceStartDate(string $priceStartDate): Record
+    {
+        $this->priceStartDate = $priceStartDate;
 
         return $this;
     }

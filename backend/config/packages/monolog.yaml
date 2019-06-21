@@ -1,0 +1,15 @@
+monolog:
+  handlers:
+    importer:
+      type: stream
+      path: "%kernel.logs_dir%/importer_%kernel.environment%.log"
+      level: debug
+      channels: [importer]
+      include_stacktraces: true
+    scraper:
+      type: stream
+      path: "%kernel.logs_dir%/scraper_%kernel.environment%.log"
+      level: debug
+      channels: [scraper]
+      include_stacktraces: true
+  channels: ['importer', 'scraper']
