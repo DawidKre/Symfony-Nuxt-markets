@@ -207,19 +207,4 @@ class ScraperManager
 
         return $units;
     }
-
-    /**
-     * @param string $category
-     *
-     * @return Category
-     *
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    private function getCategory(string $category): Category
-    {
-        return $this->entityManager
-            ->getRepository(Category::class)
-            ->findOrCreateNewByName($category);
-    }
 }
