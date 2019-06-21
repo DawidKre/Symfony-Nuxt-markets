@@ -194,7 +194,6 @@ class ScraperManager
      */
     private function convertUnits(string $unitsString): array
     {
-        //TODO SET TO MODEL
         $convertedString = explode(' ', $unitsString);
         if (count($convertedString) > 1) {
             $units['amount'] = 1;
