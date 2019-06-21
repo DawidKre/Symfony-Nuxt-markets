@@ -42,8 +42,8 @@ abstract class AbstractEnumType extends Type
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if ($value !== null && !in_array($value, $this->getValues(), true)) {
-            throw new InvalidArgumentException(sprintf("Invalid '%s' value.", $this->getName()));
+        if ($value != null && !in_array($value, $this->getValues())) {
+            throw new \InvalidArgumentException("Invalid '" . $this->getName() . "' value.");
         }
 
         return $value;

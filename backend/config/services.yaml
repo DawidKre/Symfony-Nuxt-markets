@@ -10,7 +10,9 @@ services:
   _defaults:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-
+    bind:
+      # W dowolnym servicie mozemy wstrzyknac parametr $projectDir zawierajacy aktualna sciezke do projektu na serwerze
+      $projectDir: '%kernel.project_dir%'
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
   App\:
@@ -27,3 +29,4 @@ services:
   # please note that last definitions always *replace* previous ones
   Goutte\Client:
   GuzzleHttp\Client:
+  League\Csv\Writer:

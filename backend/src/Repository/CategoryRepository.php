@@ -14,37 +14,36 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class CategoryRepository extends ServiceEntityRepository
 {
+    /**
+     * CategoryRepository constructor.
+     *
+     * @param RegistryInterface $registry
+     */
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Category::class);
     }
 
-    // /**
-    //  * @return Category[] Returns an array of Category objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param string $name
+     *
+     * @return Category
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function findOrCreateNewByName(string $name): Category
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $category = $this->findOneBy(['name' => $name]);
 
-    /*
-    public function findOneBySomeField($value): ?Category
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (!$category) {
+            $brewer = new Category();
+            $brewer->setName($name);
+
+            $this->_em->persist($brewer);
+            $this->_em->flush();
+        }
+
+        return $category;
     }
-    */
 }
