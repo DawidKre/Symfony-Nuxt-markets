@@ -94,7 +94,6 @@ class ScraperManager
             $scraperLog->setCsvFile($file);
 
             $this->saveScraperLog($scraperLog, true);
-
         } catch (Exception $e) {
             $scraperLog->setErrorMessage($e->getMessage());
             $this->saveScraperLog($scraperLog, false);
@@ -195,7 +194,6 @@ class ScraperManager
             $units['amount'] = 1;
             $units['quantity'] = $convertedString[0];
             $units['unit'] = UnitType::getUnitTypeByString($convertedString[1]);
-
         } else {
             $units['amount'] = 1;
             $units['quantity'] = 1;
