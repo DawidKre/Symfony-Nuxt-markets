@@ -11,7 +11,7 @@ use App\BusinessLogic\SharedLogic\Model\EnumTypeName;
  * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\MarketProductRepository")
  */
-class MarketProduct
+class MarketProduct extends AbstractBaseEntity
 {
     /**
      * @ORM\Id()

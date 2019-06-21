@@ -12,7 +12,7 @@ use App\BusinessLogic\SharedLogic\Model\EnumTypeName;
  * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\MasterProductRepository")
  */
-class MasterProduct
+class MasterProduct extends AbstractBaseEntity
 {
     /**
      * @ORM\Id()

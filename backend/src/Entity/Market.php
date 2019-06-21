@@ -9,9 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource()
+ *
  * @ORM\Entity(repositoryClass="App\Repository\MarketRepository")
  */
-class Market
+class Market extends AbstractBaseEntity
 {
     /**
      * @ORM\Id()
