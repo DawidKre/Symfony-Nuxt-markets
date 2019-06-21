@@ -2,13 +2,12 @@
 
 namespace App\BusinessLogic\Scraper\Service;
 
+use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Model\Record;
-use App\BusinessLogic\Scraper\Model\RecordInterface;
 use App\BusinessLogic\SharedLogic\Model\UnitType;
-use App\BusinessLogic\SharedLogic\Service\CsvService;
-use App\Entity\Category;
+use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
 use App\Entity\Market;
-use ArrayIterator;
+use App\Entity\ScraperLog;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use DOMElement;
@@ -30,31 +29,38 @@ class ScraperManager
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var CsvService */
+    /** @var CsvWriterService */
     private $csvService;
 
     /** @var string */
     private $projectDir;
+    /**
+     * @var ImportService
+     */
+    private $importService;
 
     /**
      * @param GoutteClient           $client
      * @param GuzzleClient           $guzzleClient
      * @param EntityManagerInterface $entityManager
-     * @param CsvService             $csvService
+     * @param CsvWriterService       $csvService
+     * @param ImportService          $importService
      * @param string                 $projectDir
      */
     public function __construct(
         GoutteClient $client,
         GuzzleClient $guzzleClient,
         EntityManagerInterface $entityManager,
-        CsvService $csvService,
-        $projectDir
+        CsvWriterService $csvService,
+        ImportService $importService,
+        string $projectDir
     ) {
         $this->client = $client;
         $this->guzzleClient = $guzzleClient;
         $this->entityManager = $entityManager;
         $this->csvService = $csvService;
         $this->projectDir = $projectDir;
+        $this->importService = $importService;
     }
 
     /**

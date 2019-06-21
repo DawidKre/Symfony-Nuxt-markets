@@ -9,17 +9,14 @@ use SplTempFileObject;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class CsvService
+ * Class CsvWriterService
  */
-class CsvService
+class CsvWriterService
 {
-    /**
-     * @var Filesystem
-     */
+    /** @var Filesystem */
     private $filesystem;
-    /**
-     * @var Writer
-     */
+
+    /** @var Writer */
     private $writer;
 
     /**
@@ -33,16 +30,20 @@ class CsvService
 
     /**
      * @param string $uploadPath
+     *
+     * @return string
      */
-    public function uploadCsvFile(string $uploadPath): void
+    public function uploadCsvFile(string $uploadPath): string
     {
         $this->filesystem->appendToFile($uploadPath, $this->writer->getContent());
+
+        return $uploadPath;
     }
 
     /**
      * @param RecordInterface $record
      *
-     * @return CsvService
+     * @return CsvWriterService
      *
      * @throws CannotInsertRecord
      */
@@ -56,7 +57,7 @@ class CsvService
     /**
      * @param RecordInterface $record
      *
-     * @return CsvService
+     * @return CsvWriterService
      *
      * @throws CannotInsertRecord
      */
