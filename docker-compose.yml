@@ -12,32 +12,32 @@ services:
     networks:
       - application
 
-  #  proxy:
-  #    container_name: markets_proxy
-  #    image: jwilder/nginx-proxy
-  #    ports:
-  #      - "80:80"
-  #    volumes:
-  #      - /var/run/docker.sock:/tmp/docker.sock:ro
-  #    networks:
-  #      - application
-  #
-  #  nginx:
-  #    image: kreciszd/markets_nginx:1.0
-  #    container_name: markets_nginx
-  #    build: docker/nginx
-  #    volumes:
-  #      - './backend/public:/var/www/html/public:cached'
-  #    ports:
-  #      - ${PHP_PORT}:80
-  #    environment:
-  #      - VIRTUAL_HOST=${PHP_VHOST}
-  #    depends_on:
-  #      - php
-  #    networks:
-  #      application:
-  #        aliases:
-  #        - ${PHP_VHOST}
+  proxy:
+    container_name: markets_proxy
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - application
+
+  nginx:
+    image: kreciszd/markets_nginx:1.0
+    container_name: markets_nginx
+    build: docker/nginx
+    volumes:
+      - './backend/public:/var/www/html/public:cached'
+    ports:
+      - ${PHP_PORT}:80
+    environment:
+      - VIRTUAL_HOST=${PHP_VHOST}
+    depends_on:
+      - php
+    networks:
+      application:
+        aliases:
+          - ${PHP_VHOST}
 
   postgres:
     container_name: markets_postgres
