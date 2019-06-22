@@ -2,10 +2,11 @@ version: '3.3'
 
 services:
   php:
+    image: dk/markets/php:1.0
     container_name: markets_php
     build: php
     volumes:
-      - '../:/var/www/html:cached'
+      - '../:/var/www/html:cached'git remote set-url
     depends_on:
       - postgres
     networks:
