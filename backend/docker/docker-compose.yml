@@ -6,7 +6,7 @@ services:
     container_name: markets_php
     build: php
     volumes:
-      - '../:/var/www/html:cached'git remote set-url
+      - '../:/var/www/html:cached'
     depends_on:
       - postgres
     networks:
