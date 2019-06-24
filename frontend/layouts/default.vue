@@ -6,7 +6,7 @@
     >
       <img
         src="~/assets/file.jpg"
-        style="max-height: 100%; max-width: 100%; margin: 200px 0">
+        style="max-height: 50%; max-width: 50%; margin: auto auto">
       <div style="background-color: black">..</div>
     </v-app>
     <v-app v-if="ready">
