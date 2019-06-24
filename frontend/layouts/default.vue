@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-app
-      style="background-color: black;"
       v-if="!ready"
+      style="background-color: black;"
     >
       <img
         src="~/assets/file.jpg"
@@ -11,19 +11,19 @@
     </v-app>
     <v-app v-if="ready">
       <v-navigation-drawer
+        v-model="drawer"
         :clipped="clipped"
         :mini-variant="miniVariant"
         app
         fixed
-        v-model="drawer"
       >
         <v-list>
           <v-list-tile
+            v-for="(item, i) in items"
             :key="i"
             :to="item.to"
             exact
             router
-            v-for="(item, i) in items"
           >
             <v-list-tile-action>
               <v-icon v-html="item.icon"/>
@@ -41,27 +41,27 @@
       >
         <v-toolbar-side-icon @click="drawer = !drawer"/>
         <v-btn
-          @click.stop="miniVariant = !miniVariant"
           icon
+          @click.stop="miniVariant = !miniVariant"
         >
           <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"/>
         </v-btn>
         <v-btn
-          @click.stop="clipped = !clipped"
           icon
+          @click.stop="clipped = !clipped"
         >
           <v-icon>web</v-icon>
         </v-btn>
         <v-btn
-          @click.stop="fixed = !fixed"
           icon
+          @click.stop="fixed = !fixed"
         >
           <v-icon>remove</v-icon>
         </v-btn>
         <v-toolbar-title v-text="title"/>
         <v-btn
-          @click.stop="rightDrawer = !rightDrawer"
           icon
+          @click.stop="rightDrawer = !rightDrawer"
         >
           <v-icon>menu</v-icon>
         </v-btn>
@@ -72,10 +72,10 @@
         </v-container>
       </v-content>
       <v-navigation-drawer
+        v-model="rightDrawer"
         :right="right"
         fixed
         temporary
-        v-model="rightDrawer"
       >
         <v-list>
           <v-list-tile @click.native="right = !right">
