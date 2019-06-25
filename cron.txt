@@ -1,1 +1,1 @@
-* * * * * cd /var/www/html && bin/console scrape:markets
+* * * * *  cd /var/www/html/markets/Symfony-Nuxt-markets/ && docker-compose exec php bin/console scrape:markets >> /dev/null 2>&1

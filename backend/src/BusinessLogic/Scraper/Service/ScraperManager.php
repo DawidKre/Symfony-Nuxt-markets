@@ -14,6 +14,7 @@ use DOMElement;
 use Exception;
 use Goutte\Client as GoutteClient;
 use GuzzleHttp\Client as GuzzleClient;
+use Nexy\Slack\Client as SlackClient;
 
 /**
  * Class ScraperManager
@@ -38,12 +39,16 @@ class ScraperManager
     /** @var CheckerService */
     private $checkerService;
 
+    /** @var SlackClient */
+    private $slackClient;
+
     /**
      * @param GoutteClient           $client
      * @param GuzzleClient           $guzzleClient
      * @param EntityManagerInterface $entityManager
      * @param CsvWriterService       $csvService
      * @param CheckerService         $checkerService
+     * @param SlackClient $slackClient
      * @param string                 $projectDir
      */
     public function __construct(
@@ -52,6 +57,7 @@ class ScraperManager
         EntityManagerInterface $entityManager,
         CsvWriterService $csvService,
         CheckerService $checkerService,
+        SlackClient $slackClient,
         string $projectDir
     ) {
         $this->client = $client;
@@ -60,10 +66,12 @@ class ScraperManager
         $this->csvService = $csvService;
         $this->projectDir = $projectDir;
         $this->checkerService = $checkerService;
+        $this->slackClient = $slackClient;
     }
 
     /**
      * @throws ScraperException
+     * @throws \Http\Client\Exception
      */
     public function scrapeMarkets(): void
     {
@@ -76,11 +84,17 @@ class ScraperManager
             $crawler = $this->client->request('GET', $market->getPricesUrl());
             $mainNode = $crawler->filter('#notowania');
 
+            $message = $this->slackClient->createMessage();
             $checkStatus = $this->checkerService->checkMarketPrices($market, $mainNode->text());
+
             if ($checkStatus) {
+                $message->setText('Stopped Scraping. Changes not found: ' . (new DateTime())->format('Y-m-d H:i:s'));
+                $this->slackClient->sendMessage($message);
+
                 return;
             }
 
+            $message->setText('Start Scraping. Changes found: ' . (new DateTime())->format('Y-m-d H:i:s'));
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
             $this->csvService->setHeader(new Record());
             $category = '';
@@ -101,6 +115,7 @@ class ScraperManager
                 }
             }
 
+            $this->slackClient->sendMessage($message);
             $file = $this->uploadFile($market->getName());
             $scraperLog->setCsvFile($file);
             $this->saveScraperLog($scraperLog, true);

@@ -4,11 +4,11 @@ namespace App\BusinessLogic\Scraper\Command;
 
 use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Service\ScraperManager;
+use Http\Client\Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Class ScrapeMarketsCommand
@@ -55,6 +55,13 @@ class ScrapeMarketsCommand extends Command
             $this->logger->notice('Scraping finished');
         } catch (ScraperException $e) {
             $this->logger->error('CannotInsertRecord: '.$e->getMessage(), [
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        } catch (Exception $e) {
+            $this->logger->error('Slack client exception: ' . $e->getMessage(), [
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
