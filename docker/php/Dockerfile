@@ -12,6 +12,7 @@ RUN apt-get update
 RUN apt-get install -y libxslt-dev libxml2-dev libpam-dev libedit-dev
 RUN apt-get install --no-install-recommends -y libpq-dev
 RUN docker-php-ext-install pdo pgsql pdo_pgsql zip
+RUN apt-get update && apt-get -y install cron
 
 # Install Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \

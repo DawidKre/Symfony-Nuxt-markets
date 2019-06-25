@@ -27,6 +27,10 @@ services:
     resource: '../src/Controller'
     tags: ['controller.service_arguments']
 
+  App\BusinessLogic\Scraper\EventSubscriber\MarketSubscriber:
+    tags:
+      - { name: doctrine.event_listener, event: postPersist }
+
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
   Goutte\Client:

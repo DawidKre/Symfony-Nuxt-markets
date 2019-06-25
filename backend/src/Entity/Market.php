@@ -62,27 +62,41 @@ class Market extends AbstractBaseEntity
     private $scraperLogs;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ScraperCheck", mappedBy="market")
+     * @ORM\OneToOne(targetEntity="App\Entity\ScraperCheck", mappedBy="market", cascade={"persist", "remove"})
      */
-    private $scraperChecks;
+    private $scraperCheck;
 
+
+    /**
+     * Market constructor.
+     */
     public function __construct()
     {
         $this->marketProducts = new ArrayCollection();
         $this->scraperLogs = new ArrayCollection();
-        $this->scraperChecks = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return Market
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -90,11 +104,19 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getUrl(): ?string
     {
         return $this->url;
     }
 
+    /**
+     * @param string $url
+     *
+     * @return Market
+     */
     public function setUrl(string $url): self
     {
         $this->url = $url;
@@ -102,11 +124,19 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPricesUrl(): ?string
     {
         return $this->pricesUrl;
     }
 
+    /**
+     * @param string $pricesUrl
+     *
+     * @return Market
+     */
     public function setPricesUrl(string $pricesUrl): self
     {
         $this->pricesUrl = $pricesUrl;
@@ -114,11 +144,19 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getAddress(): ?string
     {
         return $this->address;
     }
 
+    /**
+     * @param string $address
+     *
+     * @return Market
+     */
     public function setAddress(string $address): self
     {
         $this->address = $address;
@@ -126,11 +164,19 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    /**
+     * @param string|null $description
+     *
+     * @return Market
+     */
     public function setDescription(?string $description): self
     {
         $this->description = $description;
@@ -138,11 +184,19 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getLogo(): ?string
     {
         return $this->logo;
     }
 
+    /**
+     * @param string|null $logo
+     *
+     * @return Market
+     */
     public function setLogo(?string $logo): self
     {
         $this->logo = $logo;
@@ -158,6 +212,11 @@ class Market extends AbstractBaseEntity
         return $this->marketProducts;
     }
 
+    /**
+     * @param MarketProduct $marketProduct
+     *
+     * @return Market
+     */
     public function addMarketProduct(MarketProduct $marketProduct): self
     {
         if (!$this->marketProducts->contains($marketProduct)) {
@@ -168,6 +227,11 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @param MarketProduct $marketProduct
+     *
+     * @return Market
+     */
     public function removeMarketProduct(MarketProduct $marketProduct): self
     {
         if ($this->marketProducts->contains($marketProduct)) {
@@ -189,6 +253,11 @@ class Market extends AbstractBaseEntity
         return $this->scraperLogs;
     }
 
+    /**
+     * @param ScraperLog $scraperLog
+     *
+     * @return Market
+     */
     public function addScraperLog(ScraperLog $scraperLog): self
     {
         if (!$this->scraperLogs->contains($scraperLog)) {
@@ -199,6 +268,11 @@ class Market extends AbstractBaseEntity
         return $this;
     }
 
+    /**
+     * @param ScraperLog $scraperLog
+     *
+     * @return Market
+     */
     public function removeScraperLog(ScraperLog $scraperLog): self
     {
         if ($this->scraperLogs->contains($scraperLog)) {
@@ -213,31 +287,26 @@ class Market extends AbstractBaseEntity
     }
 
     /**
-     * @return Collection|ScraperCheck[]
+     * @return ScraperCheck|null
      */
-    public function getScraperChecks(): Collection
+    public function getScraperCheck(): ?ScraperCheck
     {
-        return $this->scraperChecks;
+        return $this->scraperCheck;
     }
 
-    public function addScraperCheck(ScraperCheck $scraperCheck): self
+    /**
+     * @param ScraperCheck|null $scraperCheck
+     *
+     * @return Market
+     */
+    public function setScraperCheck(?ScraperCheck $scraperCheck): self
     {
-        if (!$this->scraperChecks->contains($scraperCheck)) {
-            $this->scraperChecks[] = $scraperCheck;
-            $scraperCheck->setMarket($this);
-        }
+        $this->scraperCheck = $scraperCheck;
 
-        return $this;
-    }
-
-    public function removeScraperCheck(ScraperCheck $scraperCheck): self
-    {
-        if ($this->scraperChecks->contains($scraperCheck)) {
-            $this->scraperChecks->removeElement($scraperCheck);
-            // set the owning side to null (unless already changed)
-            if ($scraperCheck->getMarket() === $this) {
-                $scraperCheck->setMarket(null);
-            }
+        // set (or unset) the owning side of the relation if necessary
+        $newMarket = $scraperCheck === null ? null : $this;
+        if ($newMarket !== $scraperCheck->getMarket()) {
+            $scraperCheck->setMarket($newMarket);
         }
 
         return $this;

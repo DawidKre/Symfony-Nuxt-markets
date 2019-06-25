@@ -7,9 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource()
+ *
  * @ORM\Entity(repositoryClass="App\Repository\ScraperCheckRepository")
  */
-class ScraperCheck
+class ScraperCheck extends AbstractBaseEntity
 {
     /**
      * @ORM\Id()
@@ -24,20 +25,31 @@ class ScraperCheck
     private $pricesHash;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Market", inversedBy="scraperChecks")
+     * @ORM\OneToOne(targetEntity="App\Entity\Market", inversedBy="scraperCheck", cascade={"persist", "remove"})
      */
     private $market;
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPricesHash(): ?string
     {
         return $this->pricesHash;
     }
 
+    /**
+     * @param string|null $pricesHash
+     *
+     * @return ScraperCheck
+     */
     public function setPricesHash(?string $pricesHash): self
     {
         $this->pricesHash = $pricesHash;
