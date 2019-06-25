@@ -34,17 +34,16 @@ class ScraperManager
 
     /** @var string */
     private $projectDir;
-    /**
-     * @var ImportService
-     */
-    private $importService;
+
+    /** @var CheckerService */
+    private $checkerService;
 
     /**
      * @param GoutteClient           $client
      * @param GuzzleClient           $guzzleClient
      * @param EntityManagerInterface $entityManager
      * @param CsvWriterService       $csvService
-     * @param ImportService          $importService
+     * @param CheckerService         $checkerService
      * @param string                 $projectDir
      */
     public function __construct(
@@ -52,7 +51,7 @@ class ScraperManager
         GuzzleClient $guzzleClient,
         EntityManagerInterface $entityManager,
         CsvWriterService $csvService,
-        ImportService $importService,
+        CheckerService $checkerService,
         string $projectDir
     ) {
         $this->client = $client;
@@ -60,7 +59,7 @@ class ScraperManager
         $this->entityManager = $entityManager;
         $this->csvService = $csvService;
         $this->projectDir = $projectDir;
-        $this->importService = $importService;
+        $this->checkerService = $checkerService;
     }
 
     /**
@@ -76,10 +75,16 @@ class ScraperManager
             $this->client->setClient($this->guzzleClient);
             $crawler = $this->client->request('GET', $market->getPricesUrl());
             $mainNode = $crawler->filter('#notowania');
+
+            $checkStatus = $this->checkerService->checkMarketPrices($market, $mainNode->text());
+            if ($checkStatus) {
+                return;
+            }
+
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
             $this->csvService->setHeader(new Record());
-
             $category = '';
+
             foreach ($mainNode->children() as $node) {
                 if ($node->tagName === 'h2') {
                     $category = $node->textContent;
@@ -98,8 +103,8 @@ class ScraperManager
 
             $file = $this->uploadFile($market->getName());
             $scraperLog->setCsvFile($file);
-
             $this->saveScraperLog($scraperLog, true);
+            $this->checkerService->updateScrapeCheck($market, $mainNode->text());
         } catch (Exception $e) {
             $scraperLog->setErrorMessage($e->getMessage());
             $this->saveScraperLog($scraperLog, false);

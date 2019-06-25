@@ -61,10 +61,16 @@ class Market extends AbstractBaseEntity
      */
     private $scraperLogs;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ScraperCheck", mappedBy="market")
+     */
+    private $scraperChecks;
+
     public function __construct()
     {
         $this->marketProducts = new ArrayCollection();
         $this->scraperLogs = new ArrayCollection();
+        $this->scraperChecks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -200,6 +206,37 @@ class Market extends AbstractBaseEntity
             // set the owning side to null (unless already changed)
             if ($scraperLog->getMarket() === $this) {
                 $scraperLog->setMarket(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ScraperCheck[]
+     */
+    public function getScraperChecks(): Collection
+    {
+        return $this->scraperChecks;
+    }
+
+    public function addScraperCheck(ScraperCheck $scraperCheck): self
+    {
+        if (!$this->scraperChecks->contains($scraperCheck)) {
+            $this->scraperChecks[] = $scraperCheck;
+            $scraperCheck->setMarket($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScraperCheck(ScraperCheck $scraperCheck): self
+    {
+        if ($this->scraperChecks->contains($scraperCheck)) {
+            $this->scraperChecks->removeElement($scraperCheck);
+            // set the owning side to null (unless already changed)
+            if ($scraperCheck->getMarket() === $this) {
+                $scraperCheck->setMarket(null);
             }
         }
 
