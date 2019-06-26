@@ -38,16 +38,6 @@ class CheckerService
     }
 
     /**
-     * @param string $text
-     *
-     * @return string
-     */
-    private function hashText(string $text): string
-    {
-        return hash('sha256', $text);
-    }
-
-    /**
      * @param Market $market
      * @param string $pricesText
      */
@@ -63,5 +53,15 @@ class CheckerService
 
         $this->entityManager->persist($scrapeCheck);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
+    private function hashText(string $text): string
+    {
+        return hash('sha256', $text);
     }
 }

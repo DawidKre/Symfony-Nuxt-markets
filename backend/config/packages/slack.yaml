@@ -6,10 +6,10 @@ nexy_slack:
 
   # The Slack API Incoming WebHooks URL.
   endpoint:             https://hooks.slack.com/services/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
-  channel:              scraping
+  channel:              '#scraping'
   username:             Scraper
-  icon:                 null
-  link_names:           false
+  icon:                 ':ghost:'
+  link_names:           true
   unfurl_links:         false
   unfurl_media:         true
   allow_markdown:       true

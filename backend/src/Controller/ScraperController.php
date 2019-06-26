@@ -29,4 +29,12 @@ class ScraperController extends AbstractController
 
         return new Response(['200']);
     }
+
+    /**
+     * @Route("/", name="home")
+     */
+    public function home()
+    {
+        return $this->redirect('/api');
+    }
 }
