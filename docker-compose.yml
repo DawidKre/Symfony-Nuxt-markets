@@ -4,7 +4,7 @@ services:
   php:
     image: kreciszd/markets_php:1.0
     container_name: markets_php
-    build: docker/php
+    build: backend/docker/php
     volumes:
       - './backend:/var/www/html:cached'
     depends_on:
@@ -25,7 +25,7 @@ services:
   nginx:
     image: kreciszd/markets_nginx:1.0
     container_name: markets_nginx
-    build: docker/nginx
+    build: backend/docker/nginx
     volumes:
       - './backend/public:/var/www/html/public:cached'
     ports:
@@ -73,7 +73,7 @@ services:
     container_name: markets_nuxt
     build:
       context: ./frontend
-      dockerfile: ../docker/nuxt/Dockerfile
+      dockerfile: docker/nuxt/Dockerfile
     tty: true
     ports:
       - ${NUXT_PORT}:3000
