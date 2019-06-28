@@ -6,7 +6,9 @@ jobs:
       - image: kreciszd/markets_php:1.0
 
     steps:
-
+      - run:
+          name: Install System Packages
+          command: ls
 workflows:
   version: 2
   build_test_and_deploy:
