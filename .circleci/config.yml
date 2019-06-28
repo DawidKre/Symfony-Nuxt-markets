@@ -7,8 +7,6 @@ jobs:
 
     steps:
       - run:
-          name: Install System Packages
-          command: docker-compose up
 workflows:
   version: 2
   build_test_and_deploy:
