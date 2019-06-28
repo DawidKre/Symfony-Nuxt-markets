@@ -25,7 +25,9 @@ services:
   nginx:
     image: kreciszd/markets_nginx:1.0
     container_name: markets_nginx
-    build: backend/docker/nginx
+    build:
+      context: ./backend/docker/nginx
+      dockerfile: Dockerfile
     volumes:
       - './backend/public:/var/www/html/public:cached'
     ports:

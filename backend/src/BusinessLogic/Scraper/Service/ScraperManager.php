@@ -86,15 +86,16 @@ class ScraperManager
 
             $message = $this->slackClient->createMessage();
             $checkStatus = $this->checkerService->checkMarketPrices($market, $mainNode->text());
+            $date = (new DateTime())->format('Y-m-d H:i:s');
 
             if ($checkStatus) {
-                $message->setText('Stopped Scraping. Changes not found: ' . (new DateTime())->format('Y-m-d H:i:s'));
+                $message->setText("Stopped Scraping. Changes not found: {$date}");
                 $this->slackClient->sendMessage($message);
 
                 return;
             }
 
-            $message->setText('Start Scraping. Changes found: ' . (new DateTime())->format('Y-m-d H:i:s'));
+            $message->setText("!!!! Start Scraping. Changes found: {$date}");
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
             $this->csvService->setHeader(new Record());
             $category = '';
