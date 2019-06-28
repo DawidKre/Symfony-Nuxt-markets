@@ -5,8 +5,8 @@ jobs:
     docker:
       - image: kreciszd/markets_php:1.0
 
-    steps:
-      - run:
+#    steps:
+#      - run:
 workflows:
   version: 2
   build_test_and_deploy:
