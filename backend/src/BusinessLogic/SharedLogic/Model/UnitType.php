@@ -22,11 +22,11 @@ class UnitType extends Enum
     public const MILLILITERS = 'MILLILITERS';
 
     /**
-     * @param $name
+     * @param string $name
      *
      * @return mixed
      */
-    public static function getUnitTypeByString($name): string
+    public static function getUnitTypeByString(string $name): string
     {
         $unitTypes = [
             'kg' => self::KILO,
@@ -37,8 +37,6 @@ class UnitType extends Enum
             'ml' => self::MILLILITERS,
         ];
 
-        return $unitTypes[$name];
+        return $unitTypes[$name] ?? self::PIECE;
     }
-
-
 }

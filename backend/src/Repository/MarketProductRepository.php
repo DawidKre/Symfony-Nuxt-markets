@@ -4,8 +4,6 @@ namespace App\Repository;
 
 use App\Entity\MarketProduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -16,6 +14,10 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class MarketProductRepository extends ServiceEntityRepository
 {
+    /**
+     * MarketProductRepository constructor.
+     * @param RegistryInterface $registry
+     */
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, MarketProduct::class);
@@ -26,20 +28,21 @@ class MarketProductRepository extends ServiceEntityRepository
      *
      * @return MarketProduct
      *
-     * @throws ORMException
-     * @throws OptimisticLockException
      */
-    public function findOrCreateNewByName(string $name): MarketProduct
+    public function findOneByName(string $name): ?MarketProduct
     {
-        $marketProduct = $this->findOneBy(['name' => $name]);
+        return $this->findOneBy(['name' => $name]);
+    }
 
-        if (!$marketProduct) {
-            $marketProduct = new MarketProduct();
-            $marketProduct->setName($name);
-
-            $this->_em->persist($marketProduct);
-            $this->_em->flush();
-        }
+    /**
+     * @param string $name
+     *
+     * @return MarketProduct|null
+     */
+    public function createByName(string $name): ?MarketProduct
+    {
+        $marketProduct = new MarketProduct();
+        $marketProduct->setName($name);
 
         return $marketProduct;
     }

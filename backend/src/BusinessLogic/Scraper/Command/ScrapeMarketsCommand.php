@@ -61,7 +61,7 @@ class ScrapeMarketsCommand extends Command
                 'trace' => $e->getTraceAsString(),
             ]);
         } catch (Exception $e) {
-            $this->logger->error('Slack client exception: ' . $e->getMessage(), [
+            $this->logger->error("Slack client exception: {$e->getMessage()}", [
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

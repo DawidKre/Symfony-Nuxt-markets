@@ -78,13 +78,13 @@ class ScraperManager
         $market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
         $scraperLog = new ScraperLog();
         $scraperLog->setMarket($market);
+        $message = $this->slackClient->createMessage();
 
         try {
             $this->client->setClient($this->guzzleClient);
             $crawler = $this->client->request('GET', $market->getPricesUrl());
             $mainNode = $crawler->filter('#notowania');
 
-            $message = $this->slackClient->createMessage();
             $checkStatus = $this->checkerService->checkMarketPrices($market, $mainNode->text());
             $date = (new DateTime())->format('Y-m-d H:i:s');
 
@@ -124,6 +124,8 @@ class ScraperManager
         } catch (Exception $e) {
             $scraperLog->setErrorMessage($e->getMessage());
             $this->saveScraperLog($scraperLog, false);
+            $message->setText("!!!! Error: {$e->getMessage()}");
+            $this->slackClient->sendMessage($message);
 
             throw new ScraperException($e->getMessage(), 0, $e);
         }
@@ -190,6 +192,7 @@ class ScraperManager
     private function setRecord(DOMElement $tr, Market $market, string $category, string $priceStartDate): Record
     {
         $record = new Record();
+
         $units = $this->convertUnits($tr->childNodes[2]->textContent);
         $record->setName($tr->childNodes[1]->textContent);
         $record->setMarket($market->getName());

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\BusinessLogic\Scraper\Service;
+namespace App\BusinessLogic\Importer\Service;
 
 use App\BusinessLogic\SharedLogic\Service\CsvReaderService;
 use App\Entity\MarketProduct;
@@ -48,9 +48,7 @@ class ImportService
         foreach ($records as $record) {
             $marketProduct = $this->entityManager
                 ->getRepository(MarketProduct::class)
-                ->findOneByName($record['name']);
-
-
+                ->findOrCreateNewByName($record['name']);
 
 
             $prices = new Prices();
