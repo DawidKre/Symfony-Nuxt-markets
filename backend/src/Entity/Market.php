@@ -66,7 +66,6 @@ class Market extends AbstractBaseEntity
      */
     private $scraperCheck;
 
-
     /**
      * Market constructor.
      */
@@ -304,7 +303,7 @@ class Market extends AbstractBaseEntity
         $this->scraperCheck = $scraperCheck;
 
         // set (or unset) the owning side of the relation if necessary
-        $newMarket = $scraperCheck === null ? null : $this;
+        $newMarket = null === $scraperCheck ? null : $this;
         if ($newMarket !== $scraperCheck->getMarket()) {
             $scraperCheck->setMarket($newMarket);
         }

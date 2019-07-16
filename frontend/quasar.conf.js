@@ -38,6 +38,7 @@ module.exports = function (ctx) {
         'QDrawer',
         'QPageContainer',
         'QPage',
+        'QSeparator',
         'QToolbar',
         'QToolbarTitle',
         'QBtn',
@@ -45,7 +46,8 @@ module.exports = function (ctx) {
         'QList',
         'QItem',
         'QItemSection',
-        'QItemLabel'
+        'QItemLabel',
+        'QScrollArea',
       ],
 
       directives: [

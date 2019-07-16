@@ -7,7 +7,7 @@ use League\Csv\Exception;
 use League\Csv\Reader;
 
 /**
- * Class CsvReaderService
+ * Class CsvReaderService.
  */
 class CsvReaderService
 {

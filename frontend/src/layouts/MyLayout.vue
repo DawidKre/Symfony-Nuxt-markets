@@ -1,45 +1,60 @@
 <template>
-  <q-layout view="hHh lpR fff">
-    <q-header class="bg-primary text-white" elevated>
-      <q-toolbar>
-        <q-btn @click="left = !left" dense flat icon="menu" round/>
-        <q-toolbar-title>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg"/>
-          </q-avatar>
-          Markets App {{ test() }}
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      :breakpoint="500"
-      :width="200"
-      bordered
-      content-class="bg-grey-3"
-      show-if-above
-      v-model="drawer"
-    >
-      <q-scroll-area class="fit">
-        <q-list :key="index" v-for="(menuItem, index) in menuList">
-          <q-item :active="menuItem.label === 'Outbox'" clickable v-ripple>
-            <q-item-section avatar>
-              <q-icon :name="menuItem.icon"/>
-            </q-item-section>
-            <q-item-section>
-              {{ menuItem.label }}
-            </q-item-section>
-          </q-item>
-
-          <q-separator v-if="menuItem.separator"/>
-        </q-list>
-      </q-scroll-area>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view/>
-    </q-page-container>
-  </q-layout>
+  <div>
+    <q-layout view="hHh lpR fff" v-if="1 === 2">
+      <q-header
+        class="bg-primary text-white"
+        elevated
+      >
+        <q-toolbar>
+          <q-btn
+            @click="left = !left"
+            dense
+            flat
+            icon="menu"
+            round
+          />
+          <q-toolbar-title>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+            </q-avatar>
+            Markets App {{ test() }}
+          </q-toolbar-title>
+        </q-toolbar>
+      </q-header>
+      <q-drawer
+        :breakpoint="500"
+        :width="200"
+        bordered
+        content-class="bg-grey-3"
+        show-if-above
+        v-model="drawer"
+      >
+        <q-scroll-area class="fit">
+          <q-list
+            :key="index"
+            v-for="(menuItem, index) in menuList"
+          >
+            <q-item
+              :active="menuItem.label === 'Outbox'"
+              clickable
+              v-ripple
+            >
+              <q-item-section avatar>
+                <q-icon :name="menuItem.icon" />
+              </q-item-section>
+              <q-item-section>
+                {{ menuItem.label }}
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
+      </q-drawer>
+      <q-page-container>
+        <router-view />
+      </q-page-container>
+    </q-layout>
+    <img  class="vertical-middle absolute-center" style="width: 50%" src="~assets/soon.jpg" v-else>
+  </div>
 </template>
 
 <script>
@@ -90,8 +105,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * @this {Vue}
+     */
     test () {
-      return 123
     }
   }
 }
