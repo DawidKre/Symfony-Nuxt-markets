@@ -5,7 +5,7 @@ nexy_slack:
     client: httplug.client
 
   # The Slack API Incoming WebHooks URL.
-  endpoint:             https://hooks.slack.com/services/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
+  endpoint:             '%env(SLACK_URL)%'
   channel:              '#scraping'
   username:             Scraper
   icon:                 ':ghost:'

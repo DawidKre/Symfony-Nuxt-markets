@@ -6,6 +6,7 @@ use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\SharedLogic\Model\UnitType;
 use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
+use App\BusinessLogic\SharedLogic\Service\SlackService;
 use App\Entity\Market;
 use App\Entity\ScraperLog;
 use DateTime;
@@ -14,17 +15,16 @@ use DOMElement;
 use Exception;
 use Goutte\Client as GoutteClient;
 use GuzzleHttp\Client as GuzzleClient;
-use Nexy\Slack\Client as SlackClient;
 
 /**
- * Class ScraperManager
+ * Class ScraperManager.
  */
 class ScraperManager
 {
     /** @var GoutteClient */
     private $client;
 
-    /** @var GuzzleClient*/
+    /** @var GuzzleClient */
     private $guzzleClient;
 
     /** @var EntityManagerInterface */
@@ -39,8 +39,8 @@ class ScraperManager
     /** @var CheckerService */
     private $checkerService;
 
-    /** @var SlackClient */
-    private $slackClient;
+    /** @var SlackService */
+    private $slackService;
 
     /**
      * @param GoutteClient           $client
@@ -48,7 +48,7 @@ class ScraperManager
      * @param EntityManagerInterface $entityManager
      * @param CsvWriterService       $csvService
      * @param CheckerService         $checkerService
-     * @param SlackClient $slackClient
+     * @param SlackService           $slackService
      * @param string                 $projectDir
      */
     public function __construct(
@@ -57,7 +57,7 @@ class ScraperManager
         EntityManagerInterface $entityManager,
         CsvWriterService $csvService,
         CheckerService $checkerService,
-        SlackClient $slackClient,
+        SlackService $slackService,
         string $projectDir
     ) {
         $this->client = $client;
@@ -66,7 +66,7 @@ class ScraperManager
         $this->csvService = $csvService;
         $this->projectDir = $projectDir;
         $this->checkerService = $checkerService;
-        $this->slackClient = $slackClient;
+        $this->slackService = $slackService;
     }
 
     /**
@@ -78,7 +78,6 @@ class ScraperManager
         $market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
         $scraperLog = new ScraperLog();
         $scraperLog->setMarket($market);
-        $message = $this->slackClient->createMessage();
 
         try {
             $this->client->setClient($this->guzzleClient);
@@ -89,22 +88,21 @@ class ScraperManager
             $date = (new DateTime())->format('Y-m-d H:i:s');
 
             if ($checkStatus) {
-                $message->setText("Stopped Scraping. Changes not found: {$date}");
-                $this->slackClient->sendMessage($message);
+                $this->slackService->sendMessage("Stopped Scraping. Changes not found: {$date}");
 
                 return;
             }
 
-            $message->setText("!!!! Start Scraping. Changes found: {$date}");
+            $this->slackService->sendMessage("!!!! Start Scraping. Changes found: {$date}");
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
             $this->csvService->setHeader(new Record());
             $category = '';
 
             foreach ($mainNode->children() as $node) {
-                if ($node->tagName === 'h2') {
+                if ('h2' === $node->tagName) {
                     $category = $node->textContent;
                 }
-                if ($node->tagName === 'div') {
+                if ('div' === $node->tagName) {
                     foreach ($node->childNodes as $table) {
                         foreach ($table->childNodes as $key => $tr) {
                             if ($key > 0) {
@@ -116,7 +114,6 @@ class ScraperManager
                 }
             }
 
-            $this->slackClient->sendMessage($message);
             $file = $this->uploadFile($market->getName());
             $scraperLog->setCsvFile($file);
             $this->saveScraperLog($scraperLog, true);
@@ -124,8 +121,7 @@ class ScraperManager
         } catch (Exception $e) {
             $scraperLog->setErrorMessage($e->getMessage());
             $this->saveScraperLog($scraperLog, false);
-            $message->setText("!!!! Error: {$e->getMessage()}");
-            $this->slackClient->sendMessage($message);
+            $this->slackService->sendMessage("!!!! Error: {$e->getMessage()}");
 
             throw new ScraperException($e->getMessage(), 0, $e);
         }
@@ -151,6 +147,7 @@ class ScraperManager
 
         return $date->format('Y-m-d H:i:s');
     }
+
     /**
      * @param ScraperLog $scraperLog
      * @param bool       $status
@@ -192,6 +189,7 @@ class ScraperManager
     private function setRecord(DOMElement $tr, Market $market, string $category, string $priceStartDate): Record
     {
         $record = new Record();
+        // TODO ADD Converter Service for that
 
         $units = $this->convertUnits($tr->childNodes[2]->textContent);
         $record->setName($tr->childNodes[1]->textContent);
@@ -214,6 +212,7 @@ class ScraperManager
     /**
      * @param string $unitsString
      *cd
+     *
      * @return array
      */
     private function convertUnits(string $unitsString): array

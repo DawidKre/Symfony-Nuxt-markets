@@ -7,7 +7,7 @@ use App\Entity\ScraperCheck;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Class CheckerService
+ * Class CheckerService.
  */
 class CheckerService
 {
