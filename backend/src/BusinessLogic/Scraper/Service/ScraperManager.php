@@ -5,6 +5,7 @@ namespace App\BusinessLogic\Scraper\Service;
 use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\SharedLogic\Model\UnitType;
+use App\BusinessLogic\SharedLogic\Service\CrawlerService;
 use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
 use App\BusinessLogic\SharedLogic\Service\SlackService;
 use App\Entity\Market;
@@ -13,19 +14,20 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use DOMElement;
 use Exception;
-use Goutte\Client as GoutteClient;
-use GuzzleHttp\Client as GuzzleClient;
 
 /**
  * Class ScraperManager.
  */
 class ScraperManager
 {
-    /** @var GoutteClient */
-    private $client;
+    /** @var string */
+    private const CATEGORY_TAG = 'h2';
 
-    /** @var GuzzleClient */
-    private $guzzleClient;
+    /** @var string */
+    private const ROWS_TAG = 'div';
+
+    /** @var CrawlerService */
+    private $crawlerService;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -43,8 +45,7 @@ class ScraperManager
     private $slackService;
 
     /**
-     * @param GoutteClient           $client
-     * @param GuzzleClient           $guzzleClient
+     * @param CrawlerService         $crawlerService
      * @param EntityManagerInterface $entityManager
      * @param CsvWriterService       $csvService
      * @param CheckerService         $checkerService
@@ -52,16 +53,14 @@ class ScraperManager
      * @param string                 $projectDir
      */
     public function __construct(
-        GoutteClient $client,
-        GuzzleClient $guzzleClient,
+        CrawlerService $crawlerService,
         EntityManagerInterface $entityManager,
         CsvWriterService $csvService,
         CheckerService $checkerService,
         SlackService $slackService,
         string $projectDir
     ) {
-        $this->client = $client;
-        $this->guzzleClient = $guzzleClient;
+        $this->crawlerService = $crawlerService;
         $this->entityManager = $entityManager;
         $this->csvService = $csvService;
         $this->projectDir = $projectDir;
@@ -76,14 +75,13 @@ class ScraperManager
     public function scrapeMarkets(): void
     {
         $market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
+        // TODO DBlog service
         $scraperLog = new ScraperLog();
         $scraperLog->setMarket($market);
 
         try {
-            $this->client->setClient($this->guzzleClient);
-            $crawler = $this->client->request('GET', $market->getPricesUrl());
+            $crawler = $this->crawlerService->crawlPage($market->getPricesUrl());
             $mainNode = $crawler->filter('#notowania');
-
             $checkStatus = $this->checkerService->checkMarketPrices($market, $mainNode->text());
             $date = (new DateTime())->format('Y-m-d H:i:s');
 
@@ -98,11 +96,12 @@ class ScraperManager
             $this->csvService->setHeader(new Record());
             $category = '';
 
+            // TODO Refactor foreach add new functions for h2 and div ex: h2Nodes(), divNodes()
             foreach ($mainNode->children() as $node) {
-                if ('h2' === $node->tagName) {
+                if (self::CATEGORY_TAG === $node->tagName) {
                     $category = $node->textContent;
                 }
-                if ('div' === $node->tagName) {
+                if (self::ROWS_TAG === $node->tagName) {
                     foreach ($node->childNodes as $table) {
                         foreach ($table->childNodes as $key => $tr) {
                             if ($key > 0) {
@@ -121,7 +120,7 @@ class ScraperManager
         } catch (Exception $e) {
             $scraperLog->setErrorMessage($e->getMessage());
             $this->saveScraperLog($scraperLog, false);
-            $this->slackService->sendMessage("!!!! Error: {$e->getMessage()}");
+            $this->slackService->sendErrorMessage($e->getMessage());
 
             throw new ScraperException($e->getMessage(), 0, $e);
         }
@@ -147,6 +146,8 @@ class ScraperManager
 
         return $date->format('Y-m-d H:i:s');
     }
+
+    // TODO osobny factory serwis dla logów
 
     /**
      * @param ScraperLog $scraperLog

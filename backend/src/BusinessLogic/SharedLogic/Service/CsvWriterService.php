@@ -64,7 +64,7 @@ class CsvWriterService
     public function addRecord(RecordInterface $record): self
     {
         $this->writer->insertOne($record->getAsArray());
-
+        // TODO CHECK it return needed
         return $this;
     }
 }
