@@ -33,9 +33,6 @@ class ScraperManager
     /** @var CsvWriterService */
     private $csvService;
 
-    /** @var string */
-    private $projectDir;
-
     /** @var CheckerService */
     private $checkerService;
 
@@ -49,7 +46,6 @@ class ScraperManager
      * @param CsvWriterService       $csvService
      * @param CheckerService         $checkerService
      * @param SlackService           $slackService
-     * @param string                 $projectDir
      */
     public function __construct(
         GoutteClient $client,
@@ -57,14 +53,12 @@ class ScraperManager
         EntityManagerInterface $entityManager,
         CsvWriterService $csvService,
         CheckerService $checkerService,
-        SlackService $slackService,
-        string $projectDir
+        SlackService $slackService
     ) {
         $this->client = $client;
         $this->guzzleClient = $guzzleClient;
         $this->entityManager = $entityManager;
         $this->csvService = $csvService;
-        $this->projectDir = $projectDir;
         $this->checkerService = $checkerService;
         $this->slackService = $slackService;
     }
@@ -75,7 +69,7 @@ class ScraperManager
      */
     public function scrapeMarkets(): void
     {
-        $market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
+        $this->market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
         $scraperLog = new ScraperLog();
         $scraperLog->setMarket($market);
 
@@ -90,7 +84,7 @@ class ScraperManager
             if ($checkStatus) {
                 $this->slackService->sendMessage("Stopped Scraping. Changes not found: {$date}");
 
-                return;
+//                return;
             }
 
             $this->slackService->sendMessage("!!!! Start Scraping. Changes found: {$date}");
@@ -114,8 +108,8 @@ class ScraperManager
                 }
             }
 
-            $file = $this->uploadFile($market->getName());
-            $scraperLog->setCsvFile($file);
+            $fileName = $this->uploadFile($market->getName());
+            $scraperLog->setCsvFile($fileName);
             $this->saveScraperLog($scraperLog, true);
             $this->checkerService->updateScrapeCheck($market, $mainNode->text());
         } catch (Exception $e) {
@@ -170,10 +164,9 @@ class ScraperManager
     private function uploadFile(string $marketName): string
     {
         $date = (new DateTime())->format('Y-m-d H:i:s');
-        $fileName = $marketName.'/import_'.$date.'.csv';
-        $path = $this->projectDir.'/var/storage/csv/'.$fileName;
+        $fileName = "{$marketName}/import_{$date}.csv";
 
-        return $this->csvService->uploadCsvFile($path);
+        return $this->csvService->uploadCsvFile($fileName);
     }
 
     /**
