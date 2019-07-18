@@ -5,27 +5,28 @@ namespace App\BusinessLogic\Scraper\Service;
 use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\SharedLogic\Model\UnitType;
+use App\BusinessLogic\SharedLogic\Service\CrawlerService;
 use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
 use App\BusinessLogic\SharedLogic\Service\SlackService;
 use App\Entity\Market;
-use App\Entity\ScraperLog;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use DOMElement;
 use Exception;
-use Goutte\Client as GoutteClient;
-use GuzzleHttp\Client as GuzzleClient;
 
 /**
  * Class ScraperManager.
  */
 class ScraperManager
 {
-    /** @var GoutteClient */
-    private $client;
+    /** @var string */
+    private const CATEGORY_TAG = 'h2';
 
-    /** @var GuzzleClient */
-    private $guzzleClient;
+    /** @var string */
+    private const ROWS_TAG = 'div';
+
+    /** @var CrawlerService */
+    private $crawlerService;
 
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -39,28 +40,37 @@ class ScraperManager
     /** @var SlackService */
     private $slackService;
 
+    /** @var Market */
+    private $market;
+
+    /** @var ScraperLogService */
+    private $scraperLogService;
+
     /**
-     * @param GoutteClient           $client
-     * @param GuzzleClient           $guzzleClient
-     * @param EntityManagerInterface $entityManager
+     * @param CrawlerService         $crawlerService
      * @param CsvWriterService       $csvService
      * @param CheckerService         $checkerService
      * @param SlackService           $slackService
+     * @param ScraperLogService      $scraperLogService
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        GoutteClient $client,
-        GuzzleClient $guzzleClient,
-        EntityManagerInterface $entityManager,
+        CrawlerService $crawlerService,
         CsvWriterService $csvService,
         CheckerService $checkerService,
-        SlackService $slackService
+        SlackService $slackService,
+        EntityManagerInterface $entityManager,
+        ScraperLogService $scraperLogService
     ) {
-        $this->client = $client;
-        $this->guzzleClient = $guzzleClient;
-        $this->entityManager = $entityManager;
+        $this->crawlerService = $crawlerService;
         $this->csvService = $csvService;
         $this->checkerService = $checkerService;
         $this->slackService = $slackService;
+        $this->scraperLogService = $scraperLogService;
+        $this->entityManager = $entityManager;
+
+        $this->market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
+        $this->entityManager->close();
     }
 
     /**
@@ -69,16 +79,11 @@ class ScraperManager
      */
     public function scrapeMarkets(): void
     {
-        $this->market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
-        $scraperLog = new ScraperLog();
-        $scraperLog->setMarket($market);
 
         try {
-            $this->client->setClient($this->guzzleClient);
-            $crawler = $this->client->request('GET', $market->getPricesUrl());
+            $crawler = $this->crawlerService->crawlPage($this->market->getPricesUrl());
             $mainNode = $crawler->filter('#notowania');
-
-            $checkStatus = $this->checkerService->checkMarketPrices($market, $mainNode->text());
+            $checkStatus = $this->checkerService->checkMarketPrices($this->market, $mainNode->text());
             $date = (new DateTime())->format('Y-m-d H:i:s');
 
             if ($checkStatus) {
@@ -92,15 +97,16 @@ class ScraperManager
             $this->csvService->setHeader(new Record());
             $category = '';
 
+            // TODO Refactor foreach add new functions for h2 and div ex: h2Nodes(), divNodes()
             foreach ($mainNode->children() as $node) {
-                if ('h2' === $node->tagName) {
+                if (self::CATEGORY_TAG === $node->tagName) {
                     $category = $node->textContent;
                 }
-                if ('div' === $node->tagName) {
+                if (self::ROWS_TAG === $node->tagName) {
                     foreach ($node->childNodes as $table) {
                         foreach ($table->childNodes as $key => $tr) {
                             if ($key > 0) {
-                                $record = $this->setRecord($tr, $market, $category, $priceStartDate);
+                                $record = $this->setRecord($tr, $category, $priceStartDate);
                                 $this->csvService->addRecord($record);
                             }
                         }
@@ -108,14 +114,12 @@ class ScraperManager
                 }
             }
 
-            $fileName = $this->uploadFile($market->getName());
-            $scraperLog->setCsvFile($fileName);
-            $this->saveScraperLog($scraperLog, true);
-            $this->checkerService->updateScrapeCheck($market, $mainNode->text());
+            $fileName = $this->uploadFile($this->market->getName());
+            $this->scraperLogService->saveSuccessScraperLog($this->market, $fileName);
+            $this->checkerService->updateScrapeCheck($this->market, $mainNode->text());
         } catch (Exception $e) {
-            $scraperLog->setErrorMessage($e->getMessage());
-            $this->saveScraperLog($scraperLog, false);
-            $this->slackService->sendMessage("!!!! Error: {$e->getMessage()}");
+            $this->scraperLogService->saveFailedScraperLog($this->market, $e->getMessage());
+            $this->slackService->sendErrorMessage($e->getMessage());
 
             throw new ScraperException($e->getMessage(), 0, $e);
         }
@@ -143,18 +147,6 @@ class ScraperManager
     }
 
     /**
-     * @param ScraperLog $scraperLog
-     * @param bool       $status
-     */
-    private function saveScraperLog(ScraperLog $scraperLog, bool $status): void
-    {
-        $scraperLog->setSuccess($status);
-
-        $this->entityManager->persist($scraperLog);
-        $this->entityManager->flush();
-    }
-
-    /**
      * @param string $marketName
      *
      * @return string
@@ -171,7 +163,6 @@ class ScraperManager
 
     /**
      * @param DOMElement $tr
-     * @param Market     $market
      * @param string     $category
      * @param string     $priceStartDate
      *
@@ -179,14 +170,14 @@ class ScraperManager
      *
      * @throws Exception
      */
-    private function setRecord(DOMElement $tr, Market $market, string $category, string $priceStartDate): Record
+    private function setRecord(DOMElement $tr, string $category, string $priceStartDate): Record
     {
         $record = new Record();
         // TODO ADD Converter Service for that
 
         $units = $this->convertUnits($tr->childNodes[2]->textContent);
         $record->setName($tr->childNodes[1]->textContent);
-        $record->setMarket($market->getName());
+        $record->setMarket($this->market->getName());
         $record->setCategory($category);
         $record->setUnit($units['unit']);
         $record->setQuantity($units['quantity']);

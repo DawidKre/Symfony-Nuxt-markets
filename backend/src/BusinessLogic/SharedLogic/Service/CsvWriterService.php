@@ -40,28 +40,20 @@ class CsvWriterService
     /**
      * @param RecordInterface $record
      *
-     * @return CsvWriterService
-     *
      * @throws CannotInsertRecord
      */
-    public function setHeader(RecordInterface $record): self
+    public function setHeader(RecordInterface $record): void
     {
         $this->writer->insertOne($record->getParametersAsArray());
-
-        return $this;
     }
 
     /**
      * @param RecordInterface $record
      *
-     * @return CsvWriterService
-     *
      * @throws CannotInsertRecord
      */
-    public function addRecord(RecordInterface $record): self
+    public function addRecord(RecordInterface $record): void
     {
         $this->writer->insertOne($record->getAsArray());
-
-        return $this;
     }
 }
