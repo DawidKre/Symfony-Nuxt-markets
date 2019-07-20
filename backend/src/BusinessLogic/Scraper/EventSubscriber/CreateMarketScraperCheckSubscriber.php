@@ -9,9 +9,9 @@ use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 
 /**
- * Class MarketSubscriber
+ * Class CreateMarketScraperCheckSubscriber.
  */
-class MarketSubscriber implements EventSubscriber
+class CreateMarketScraperCheckSubscriber implements EventSubscriber
 {
     /**
      * @return array

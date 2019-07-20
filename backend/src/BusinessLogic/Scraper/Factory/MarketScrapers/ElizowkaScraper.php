@@ -1,10 +1,13 @@
 <?php
 
-namespace App\BusinessLogic\Scraper\Service;
+namespace App\BusinessLogic\Scraper\Factory\MarketScrapers;
 
 use App\BusinessLogic\Scraper\Converter\ElizowkaConverter;
 use App\BusinessLogic\Scraper\Exception\ScraperException;
+use App\BusinessLogic\Scraper\Factory\ScrapeMarketInterface;
 use App\BusinessLogic\Scraper\Model\Record;
+use App\BusinessLogic\Scraper\Service\CheckerService;
+use App\BusinessLogic\Scraper\Service\ScraperLogService;
 use App\BusinessLogic\SharedLogic\Service\CrawlerService;
 use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
 use App\BusinessLogic\SharedLogic\Service\SlackService;
@@ -15,9 +18,9 @@ use DOMElement;
 use Exception;
 
 /**
- * Class ScraperManager.
+ * Class ElizowkaScraper.
  */
-class ScraperManager
+class ElizowkaScraper implements ScrapeMarketInterface
 {
     /** @var string */
     private const CATEGORY_TAG = 'h2';
@@ -50,57 +53,63 @@ class ScraperManager
     private $converter;
 
     /**
-     * @param CrawlerService         $crawlerService
-     * @param CsvWriterService       $csvService
-     * @param CheckerService         $checkerService
-     * @param SlackService           $slackService
-     * @param ScraperLogService      $scraperLogService
-     * @param EntityManagerInterface $entityManager
-     * @param ElizowkaConverter      $converter
+     * @param Market            $market
+     * @param CrawlerService    $crawlerService
+     * @param CsvWriterService  $csvService
+     * @param CheckerService    $checkerService
+     * @param SlackService      $slackService
+     * @param ScraperLogService $scraperLogService
      */
     public function __construct(
+        Market $market,
         CrawlerService $crawlerService,
         CsvWriterService $csvService,
         CheckerService $checkerService,
         SlackService $slackService,
-        ScraperLogService $scraperLogService,
-        EntityManagerInterface $entityManager,
-        ElizowkaConverter $converter
+        ScraperLogService $scraperLogService
     ) {
+        $this->market = $market;
         $this->crawlerService = $crawlerService;
         $this->csvService = $csvService;
         $this->checkerService = $checkerService;
         $this->slackService = $slackService;
         $this->scraperLogService = $scraperLogService;
-        $this->entityManager = $entityManager;
-        $this->converter = $converter;
-
-        $this->market = $this->entityManager->getRepository(Market::class)->findOneBy([]);
     }
 
     /**
+     * @required
+     *
+     * @param ElizowkaConverter $converter
+     */
+    public function setConverter(ElizowkaConverter $converter): void
+    {
+        dd(123);
+        $this->converter = $converter;
+    }
+
+    /**
+     * @param Market $market
+     *
      * @throws ScraperException
      * @throws \Http\Client\Exception
      */
-    public function scrapeMarkets(): void
+    public function scrapeMarket(): void
     {
         try {
             $crawler = $this->crawlerService->crawlPage($this->market->getPricesUrl());
             $mainNode = $crawler->filter('#notowania');
             $checkStatus = $this->checkerService->checkMarketPrices($this->market, $mainNode->text());
-            $date = (new DateTime())->format('Y-m-d H:i:s');
-
             if ($checkStatus) {
-                $this->slackService->sendMessage("Stopped Scraping. Changes not found: {$date}");
+                $this->slackService->sendScraperChangesNotFoundMessage($this->market->getName());
 
 //                return;
             }
 
-            $this->slackService->sendMessage("!!!! Start Scraping. Changes found: {$date}");
+            $this->slackService->sendScraperStartScrapingMessage($this->market->getName());
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
             $this->csvService->setHeader(new Record());
-            $category = '';
 
+            $category = '';
             // TODO Refactor foreach add new functions for h2 and div ex: h2Nodes(), divNodes()
             foreach ($mainNode->children() as $node) {
                 if (self::CATEGORY_TAG === $node->tagName) {
@@ -118,10 +127,11 @@ class ScraperManager
                 }
             }
 
-            $fileName = $this->uploadFile($this->market->getName());
+            $fileName = $this->csvService->uploadMarketCsvFile($this->market->getName());
             $this->scraperLogService->saveSuccessScraperLog($this->market, $fileName);
-            $this->checkerService->updateScrapeCheck($this->market, $mainNode->text());
+            $this->checkerService->updateScrapeCheck($this->market->getScraperCheck(), $mainNode->text());
         } catch (Exception $e) {
+            // TODO set arguments is services definitions ????
             $this->scraperLogService->saveFailedScraperLog($this->market, $e->getMessage());
             $this->slackService->sendErrorMessage($e->getMessage());
 
@@ -151,21 +161,6 @@ class ScraperManager
     }
 
     /**
-     * @param string $marketName
-     *
-     * @return string
-     *
-     * @throws Exception
-     */
-    private function uploadFile(string $marketName): string
-    {
-        $date = (new DateTime())->format('Y-m-d H:i:s');
-        $fileName = "{$marketName}/import_{$date}.csv";
-
-        return $this->csvService->uploadCsvFile($fileName);
-    }
-
-    /**
      * @param DOMElement $tr
      * @param string     $category
      * @param string     $priceStartDate
@@ -178,14 +173,14 @@ class ScraperManager
     {
         $record = new Record();
         // TODO ADD Converter Service for that
-
-        $units = $this->convertUnits($tr->childNodes[2]->textContent);
+        dd($this->converter);
+        $units = $this->converter->convertUnits($tr->childNodes[2]->textContent);
         $record->setName($tr->childNodes[1]->textContent);
         $record->setMarket($this->market->getName());
         $record->setCategory($category);
-        $record->setUnit($units['unit']);
-        $record->setQuantity($units['quantity']);
-        $record->setAmount($units['amount']);
+        $record->setUnit($units->getUnit());
+        $record->setQuantity($units->getQuantity());
+        $record->setAmount($units->getAmount());
         $record->setPriceMin((float) $tr->childNodes[3]->textContent);
         $record->setPriceMax((float) $tr->childNodes[4]->textContent);
         $record->setPriceAvg((float) $tr->childNodes[5]->textContent);

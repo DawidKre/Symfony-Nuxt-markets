@@ -2,30 +2,28 @@
 
 namespace App\Controller;
 
-use App\BusinessLogic\Scraper\Service\CheckerService;
-use App\BusinessLogic\Scraper\Service\ScraperManager;
+use App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory;
 use App\Entity\Market;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**  */
 class ScraperController extends AbstractController
 {
     /**
      * @Route("/scraper", name="sraper")
      *
-     * @param ScraperManager $scraper
+     * @param ScrapeMarketFactory $scrapeMarketFactory
      *
      * @return Response
-     * @throws \League\Csv\CannotInsertRecord
      */
-    public function index(CheckerService $checkerService, ScraperManager $scraperManager): Response
+    public function index(ScrapeMarketFactory $scrapeMarketFactory): Response
     {
-        dd($scraperManager->scrapeMarkets());
-        $market = $this->getDoctrine()->getRepository(Market::class)->findOneBy([]);
-        $market->getScraperChecks()->last();
-//        $scraper->scrapeMarkets();
+        $markets = $this->getDoctrine()->getRepository(Market::class)->findAll();
+
+        foreach ($markets as $market) {
+            $scrapeMarketFactory->createScraper($market)->scrapeMarket();
+        }
 
         return new Response(['200']);
     }

@@ -52,6 +52,9 @@ class ScraperLogService
         $this->saveLog();
     }
 
+    /**
+     * Save log to database.
+     */
     private function saveLog(): void
     {
         $this->entityManager->persist($this->scraperLog);
