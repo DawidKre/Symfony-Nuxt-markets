@@ -2,7 +2,9 @@
 
 namespace App\BusinessLogic\SharedLogic\Service;
 
+use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\Scraper\Model\RecordInterface;
+use DateTime;
 use League\Csv\CannotInsertRecord;
 use League\Csv\Writer;
 use SplTempFileObject;
@@ -28,12 +30,29 @@ class CsvWriterService
     }
 
     /**
-     * @param string $fileName
+     * @param Record $record
+     *
+     * @required
+     *
+     * @throws CannotInsertRecord
+     */
+    public function setRecord(Record $record): void
+    {
+        $this->setHeader($record);
+    }
+
+    /**
+     * @param string $marketName
      *
      * @return string
+     *
+     * @throws \Exception
      */
-    public function uploadCsvFile(string $fileName): string
+    public function uploadMarketCsvFile(string $marketName): string
     {
+        $date = (new DateTime())->format('Y-m-d H:i:s');
+        $fileName = "{$marketName}/import_{$date}.csv";
+
         return $this->uploadService->uploadFile($fileName, $this->writer->getContent());
     }
 

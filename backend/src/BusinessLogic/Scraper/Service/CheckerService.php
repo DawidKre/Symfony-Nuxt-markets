@@ -38,20 +38,13 @@ class CheckerService
     }
 
     /**
-     * @param Market $market
-     * @param string $pricesText
+     * @param ScraperCheck $scraperCheck
+     * @param string       $pricesText
      */
-    public function updateScrapeCheck(Market $market, string $pricesText): void
+    public function updateScrapeCheck(ScraperCheck $scraperCheck, string $pricesText): void
     {
-        $scrapeCheck = $market->getScraperCheck();
-        if (!$scrapeCheck) {
-            $scrapeCheck = new ScraperCheck();
-            $scrapeCheck->setMarket($market);
-        }
-
-        $scrapeCheck->setPricesHash($this->hashText($pricesText));
-
-        $this->entityManager->persist($scrapeCheck);
+        $scraperCheck->setPricesHash($this->hashText($pricesText));
+        $this->entityManager->persist($scraperCheck);
         $this->entityManager->flush();
     }
 
