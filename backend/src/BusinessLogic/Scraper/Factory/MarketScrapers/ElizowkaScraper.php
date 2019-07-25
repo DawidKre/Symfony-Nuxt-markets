@@ -3,19 +3,21 @@
 namespace App\BusinessLogic\Scraper\Factory\MarketScrapers;
 
 use App\BusinessLogic\Scraper\Converter\ElizowkaConverter;
+use App\BusinessLogic\Scraper\Event\MarketNotScrapedEvent;
+use App\BusinessLogic\Scraper\Event\MarketScrapedEvent;
+use App\BusinessLogic\Scraper\Event\MarketScrapingErrorEvent;
 use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Factory\ScrapeMarketInterface;
 use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\Scraper\Model\Unit;
 use App\BusinessLogic\Scraper\Service\CheckerService;
-use App\BusinessLogic\Scraper\Service\ScraperLogService;
 use App\BusinessLogic\SharedLogic\Service\CrawlerService;
 use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
-use App\BusinessLogic\SharedLogic\Service\SlackService;
 use App\Entity\Market;
 use DateTime;
 use DOMElement;
 use Exception;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class ElizowkaScraper.
@@ -37,41 +39,35 @@ class ElizowkaScraper implements ScrapeMarketInterface
     /** @var CheckerService */
     private $checkerService;
 
-    /** @var SlackService */
-    private $slackService;
-
     /** @var Market */
     private $market;
 
-    /** @var ScraperLogService */
-    private $scraperLogService;
-
     /** @var ElizowkaConverter */
     private $converter;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
-     * @param Market            $market
-     * @param CrawlerService    $crawlerService
-     * @param CsvWriterService  $csvService
-     * @param CheckerService    $checkerService
-     * @param SlackService      $slackService
-     * @param ScraperLogService $scraperLogService
+     * @param Market                   $market
+     * @param CrawlerService           $crawlerService
+     * @param CsvWriterService         $csvService
+     * @param CheckerService           $checkerService
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         Market $market,
         CrawlerService $crawlerService,
         CsvWriterService $csvService,
         CheckerService $checkerService,
-        SlackService $slackService,
-        ScraperLogService $scraperLogService
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->market = $market;
         $this->crawlerService = $crawlerService;
         $this->csvService = $csvService;
         $this->checkerService = $checkerService;
-        $this->slackService = $slackService;
-        $this->scraperLogService = $scraperLogService;
-
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -95,9 +91,9 @@ class ElizowkaScraper implements ScrapeMarketInterface
             $mainNode = $crawler->filter('#notowania');
             $checkStatus = $this->checkerService->checkMarketPrices($this->market, $mainNode->text());
             if ($checkStatus) {
-                $this->slackService->sendScraperChangesNotFoundMessage($this->market->getName());
+                $this->eventDispatcher->dispatch(new MarketNotScrapedEvent($this->market));
 
-//                return;
+                return;
             }
 
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
@@ -111,23 +107,18 @@ class ElizowkaScraper implements ScrapeMarketInterface
                     foreach ($node->childNodes as $table) {
                         foreach ($table->childNodes as $key => $tr) {
                             if ($key > 0) {
-                                $record = $this->setRecord($tr, $category, $priceStartDate);
-                                $this->csvService->addRecord($record);
+                                $this->csvService->addRecord($this->setRecord($tr, $category, $priceStartDate));
                             }
                         }
                     }
                 }
             }
 
-            $this->slackService->sendScraperStartScrapingMessage($this->market->getName());
             $fileName = $this->csvService->uploadMarketCsvFile($this->market->getName());
-            $this->scraperLogService->saveSuccessScraperLog($this->market, $fileName);
+            $this->eventDispatcher->dispatch(new MarketScrapedEvent($this->market, $fileName));
             $this->checkerService->updateScrapeCheck($this->market->getScraperCheck(), $mainNode->text());
         } catch (Exception $e) {
-            // TODO set arguments is services definitions ????
-            $this->scraperLogService->saveFailedScraperLog($this->market, $e->getMessage());
-            $this->slackService->sendErrorMessage($e->getMessage());
-
+            $this->eventDispatcher->dispatch(new MarketScrapingErrorEvent($this->market, $e->getMessage()));
             throw new ScraperException($e->getMessage(), 0, $e);
         }
     }

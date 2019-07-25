@@ -13,9 +13,6 @@ use Nexy\Slack\Message;
  */
 class SlackService
 {
-    /** @var string */
-    private const ERROR_MESSAGE = '!!! Error: ';
-
     /** @var SlackClient */
     private $slackClient;
 
@@ -67,14 +64,14 @@ class SlackService
     }
 
     /**
+     * @param string $marketName
      * @param string $errorMessage
      *
      * @throws Exception
      */
-    public function sendErrorMessage(string $errorMessage): void
+    public function sendErrorMessage(string $marketName, string $errorMessage): void
     {
-        $text = self::ERROR_MESSAGE.$errorMessage;
-        $this->sendSlackMessage($text);
+        $this->sendSlackMessage($marketName.' -> '.SlackMessagesType::SCRAPER_ERROR.$errorMessage);
     }
 
     /**

@@ -5,11 +5,10 @@ namespace App\BusinessLogic\Scraper\Factory;
 use App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper;
 use App\BusinessLogic\Scraper\Model\MarketNameType;
 use App\BusinessLogic\Scraper\Service\CheckerService;
-use App\BusinessLogic\Scraper\Service\ScraperLogService;
 use App\BusinessLogic\SharedLogic\Service\CrawlerService;
 use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
-use App\BusinessLogic\SharedLogic\Service\SlackService;
 use App\Entity\Market;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class ScrapeMarketFactory.
@@ -22,34 +21,30 @@ class ScrapeMarketFactory
     /** @var CsvWriterService */
     private $csvService;
 
-    /** @var SlackService */
-    private $slackService;
-
     /** @var CheckerService */
     private $checkerService;
 
-    /** @var ScraperLogService */
-    private $scraperLogService;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
-     * @param CrawlerService    $crawlerService
-     * @param CsvWriterService  $csvService
-     * @param SlackService      $slackService
-     * @param CheckerService    $checkerService
-     * @param ScraperLogService $scraperLogService
+     * @param CrawlerService           $crawlerService
+     * @param CsvWriterService         $csvService
+     * @param CheckerService           $checkerService
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         CrawlerService $crawlerService,
         CsvWriterService $csvService,
-        SlackService $slackService,
         CheckerService $checkerService,
-        ScraperLogService $scraperLogService
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->crawlerService = $crawlerService;
         $this->csvService = $csvService;
-        $this->slackService = $slackService;
         $this->checkerService = $checkerService;
-        $this->scraperLogService = $scraperLogService;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -66,8 +61,7 @@ class ScrapeMarketFactory
                     $this->crawlerService,
                     $this->csvService,
                     $this->checkerService,
-                    $this->slackService,
-                    $this->scraperLogService
+                    $this->eventDispatcher
                 );
             case MarketNameType::BRONISZE_MARKET:
                 return new ElizowkaScraper(
@@ -75,8 +69,7 @@ class ScrapeMarketFactory
                     $this->crawlerService,
                     $this->csvService,
                     $this->checkerService,
-                    $this->slackService,
-                    $this->scraperLogService
+                    $this->eventDispatcher
                 );
         }
     }

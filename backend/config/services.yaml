@@ -63,9 +63,8 @@ services:
     arguments: [
       App\BusinessLogic\SharedLogic\Service\CrawlerService,
       '@app.csv_writer_service.scraper',
-      App\BusinessLogic\SharedLogic\Service\SlackService,
       App\BusinessLogic\Scraper\Service\CheckerService,
-      App\BusinessLogic\Scraper\Service\ScraperLogService
+      Symfony\Component\EventDispatcher\EventDispatcherInterface
       ]
 
   App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper:
