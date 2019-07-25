@@ -1,0 +1,13 @@
+up: docker-compose up -d --force-recreate
+stop: docker stop $(docker ps -a -q)
+build: docker-compose build
+php: docker-compose exec php bash
+console: docker-compose exec php bin/console $CMD
+composer: docker-compose exec php composer $CMD
+phpunit: docker-compose exec php bin/phpunit $CMD
+scrape: docker-compose exec php bin/console scrape:markets
+
+yarn: docker-compose exec quasar yarn $CMD
+q: docker-compose exec quasar $CMD
+npm: docker-compose exec quasar npm $CMD
+front: docker-compose exec quasar bash

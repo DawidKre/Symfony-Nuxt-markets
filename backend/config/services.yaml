@@ -27,7 +27,7 @@ services:
     resource: '../src/Controller'
     tags: ['controller.service_arguments']
 
-  App\BusinessLogic\Scraper\EventSubscriber\MarketSubscriber:
+  App\BusinessLogic\Scraper\EventSubscriber\CreateMarketScraperCheckSubscriber:
     tags:
       - { name: doctrine.event_listener, event: postPersist }
 
@@ -42,6 +42,43 @@ services:
     arguments:
       $uploadPath: '%kernel.project_dir%/var/storage/csv'
 
+  app.upload_service.logger:
+    class: App\BusinessLogic\SharedLogic\Service\UploadService
+    arguments:
+      $uploadPath: '%kernel.project_dir%/var/logs'
+
   App\BusinessLogic\SharedLogic\Service\CsvWriterService:
     arguments:
       $uploadService: '@app.upload_service.scraper'
+
+  app.csv_writer_service.scraper:
+    class: App\BusinessLogic\SharedLogic\Service\CsvWriterService
+    calls:
+      - method: setRecord
+        arguments:
+          $record: App\BusinessLogic\Scraper\Model\Record
+
+  app.scraper_factory:
+    class: App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory
+    arguments: [
+      App\BusinessLogic\SharedLogic\Service\CrawlerService,
+      '@app.csv_writer_service.scraper',
+      App\BusinessLogic\SharedLogic\Service\SlackService,
+      App\BusinessLogic\Scraper\Service\CheckerService,
+      App\BusinessLogic\Scraper\Service\ScraperLogService
+      ]
+
+  App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper:
+    factory: ['@app.scraper_factory', createScraper]
+    calls:
+      - method: setConverter
+        arguments:
+          $converter: App\BusinessLogic\Scraper\Converter\ElizowkaConverter
+    tags:
+      - { name: 'app.scraper'}
+
+  app.scraper_bronisze:
+    class: App\BusinessLogic\Scraper\Factory\MarketScrapers\BroniszeScraper
+    factory: ['@app.scraper_factory', createScraper]
+    tags:
+      - { name: 'app.scraper'}

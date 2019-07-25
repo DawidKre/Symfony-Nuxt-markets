@@ -3,7 +3,7 @@
 namespace App\BusinessLogic\Scraper\Model;
 
 /**
- * Class Record
+ * Class Record.
  */
 class Record implements RecordInterface
 {
@@ -93,13 +93,11 @@ class Record implements RecordInterface
     /**
      * @param string $market
      *
-     * @return Record
+     * @return void
      */
-    public function setMarket(string $market): Record
+    public function setMarket(string $market): void
     {
         $this->market = $market;
-
-        return $this;
     }
 
     /**
@@ -113,13 +111,11 @@ class Record implements RecordInterface
     /**
      * @param string $category
      *
-     * @return Record
+     * @return void
      */
-    public function setCategory(string $category): Record
+    public function setCategory(string $category): void
     {
         $this->category = $category;
-
-        return $this;
     }
 
     /**
@@ -133,13 +129,11 @@ class Record implements RecordInterface
     /**
      * @param string $unit
      *
-     * @return Record
+     * @return void
      */
-    public function setUnit(string $unit): Record
+    public function setUnit(string $unit): void
     {
         $this->unit = $unit;
-
-        return $this;
     }
 
     /**
@@ -153,13 +147,11 @@ class Record implements RecordInterface
     /**
      * @param float $quantity
      *
-     * @return Record
+     * @return void
      */
-    public function setQuantity(float $quantity): Record
+    public function setQuantity(float $quantity): void
     {
         $this->quantity = $quantity;
-
-        return $this;
     }
 
     /**
@@ -173,13 +165,11 @@ class Record implements RecordInterface
     /**
      * @param int $amount
      *
-     * @return Record
+     * @return void
      */
-    public function setAmount(int $amount): Record
+    public function setAmount(int $amount): void
     {
         $this->amount = $amount;
-
-        return $this;
     }
 
     /**
@@ -193,13 +183,11 @@ class Record implements RecordInterface
     /**
      * @param float $priceMin
      *
-     * @return Record
+     * @return void
      */
-    public function setPriceMin(float $priceMin): Record
+    public function setPriceMin(float $priceMin): void
     {
         $this->priceMin = $priceMin;
-
-        return $this;
     }
 
     /**
@@ -213,13 +201,11 @@ class Record implements RecordInterface
     /**
      * @param float $priceMax
      *
-     * @return Record
+     * @return void
      */
-    public function setPriceMax(float $priceMax): Record
+    public function setPriceMax(float $priceMax): void
     {
         $this->priceMax = $priceMax;
-
-        return $this;
     }
 
     /**
@@ -233,13 +219,11 @@ class Record implements RecordInterface
     /**
      * @param float $priceAvg
      *
-     * @return Record
+     * @return void
      */
-    public function setPriceAvg(float $priceAvg): Record
+    public function setPriceAvg(float $priceAvg): void
     {
         $this->priceAvg = $priceAvg;
-
-        return $this;
     }
 
     /**
@@ -253,13 +237,11 @@ class Record implements RecordInterface
     /**
      * @param float $priceDifference
      *
-     * @return Record
+     * @return void
      */
-    public function setPriceDifference(float $priceDifference): Record
+    public function setPriceDifference(float $priceDifference): void
     {
         $this->priceDifference = $priceDifference;
-
-        return $this;
     }
 
     /**
@@ -273,13 +255,11 @@ class Record implements RecordInterface
     /**
      * @param float $priceAvgPrevious
      *
-     * @return Record
+     * @return void
      */
-    public function setPriceAvgPrevious(float $priceAvgPrevious): Record
+    public function setPriceAvgPrevious(float $priceAvgPrevious): void
     {
         $this->priceAvgPrevious = $priceAvgPrevious;
-
-        return $this;
     }
 
     /**
@@ -293,13 +273,11 @@ class Record implements RecordInterface
     /**
      * @param string $scrapeDate
      *
-     * @return Record
+     * @return void
      */
-    public function setScrapeDate(string $scrapeDate): Record
+    public function setScrapeDate(string $scrapeDate): void
     {
         $this->scrapeDate = $scrapeDate;
-
-        return $this;
     }
 
 
@@ -314,12 +292,10 @@ class Record implements RecordInterface
     /**
      * @param string $priceStartDate
      *
-     * @return Record
+     * @return void
      */
-    public function setPriceStartDate(string $priceStartDate): Record
+    public function setPriceStartDate(string $priceStartDate): void
     {
         $this->priceStartDate = $priceStartDate;
-
-        return $this;
     }
 }
