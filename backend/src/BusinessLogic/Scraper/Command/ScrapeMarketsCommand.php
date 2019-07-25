@@ -54,6 +54,7 @@ class ScrapeMarketsCommand extends Command
             $this->scraperManager->scrapeMarkets();
             $this->logger->notice('Scraping finished');
         } catch (ScraperException $e) {
+
             $this->logger->error('CannotInsertRecord: '.$e->getMessage(), [
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),
@@ -68,5 +69,10 @@ class ScrapeMarketsCommand extends Command
                 'trace' => $e->getTraceAsString(),
             ]);
         }
+    }
+
+    private function formatErrorMessages($e)
+    {
+
     }
 }

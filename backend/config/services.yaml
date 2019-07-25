@@ -14,7 +14,6 @@ services:
       # W dowolnym servicie mozemy wstrzyknac parametr $projectDir zawierajacy aktualna sciezke do projektu na serwerze
       $scraperLogger: '@monolog.logger.scraper'
       $importerLogger: '@monolog.logger.importer'
-      $projectDir: '%kernel.project_dir%'
       Nexy\Slack\Client: '@nexy_slack.client'
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -37,3 +36,12 @@ services:
   Goutte\Client:
   GuzzleHttp\Client:
   League\Csv\Writer:
+
+  app.upload_service.scraper:
+    class: App\BusinessLogic\SharedLogic\Service\UploadService
+    arguments:
+      $uploadPath: '%kernel.project_dir%/var/storage/csv'
+
+  App\BusinessLogic\SharedLogic\Service\CsvWriterService:
+    arguments:
+      $uploadService: '@app.upload_service.scraper'

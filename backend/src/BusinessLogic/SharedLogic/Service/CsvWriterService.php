@@ -6,65 +6,54 @@ use App\BusinessLogic\Scraper\Model\RecordInterface;
 use League\Csv\CannotInsertRecord;
 use League\Csv\Writer;
 use SplTempFileObject;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class CsvWriterService
+ * Class CsvWriterService.
  */
 class CsvWriterService
 {
-    /** @var Filesystem */
-    private $filesystem;
-
     /** @var Writer */
     private $writer;
 
+    /** @var UploadService */
+    private $uploadService;
+
     /**
-     * @param Filesystem $filesystem
+     * @param UploadService $uploadService
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(UploadService $uploadService)
     {
-        $this->filesystem = $filesystem;
         $this->writer = Writer::createFromFileObject(new SplTempFileObject());
+        $this->uploadService = $uploadService;
     }
 
     /**
-     * @param string $uploadPath
+     * @param string $fileName
      *
      * @return string
      */
-    public function uploadCsvFile(string $uploadPath): string
+    public function uploadCsvFile(string $fileName): string
     {
-        $this->filesystem->appendToFile($uploadPath, $this->writer->getContent());
-
-        return $uploadPath;
+        return $this->uploadService->uploadFile($fileName, $this->writer->getContent());
     }
 
     /**
      * @param RecordInterface $record
      *
-     * @return CsvWriterService
-     *
      * @throws CannotInsertRecord
      */
-    public function setHeader(RecordInterface $record): self
+    public function setHeader(RecordInterface $record): void
     {
         $this->writer->insertOne($record->getParametersAsArray());
-
-        return $this;
     }
 
     /**
      * @param RecordInterface $record
      *
-     * @return CsvWriterService
-     *
      * @throws CannotInsertRecord
      */
-    public function addRecord(RecordInterface $record): self
+    public function addRecord(RecordInterface $record): void
     {
         $this->writer->insertOne($record->getAsArray());
-
-        return $this;
     }
 }
