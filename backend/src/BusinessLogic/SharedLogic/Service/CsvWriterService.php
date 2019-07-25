@@ -2,6 +2,7 @@
 
 namespace App\BusinessLogic\SharedLogic\Service;
 
+use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\Scraper\Model\RecordInterface;
 use DateTime;
 use League\Csv\CannotInsertRecord;
@@ -26,6 +27,18 @@ class CsvWriterService
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject());
         $this->uploadService = $uploadService;
+    }
+
+    /**
+     * @param Record $record
+     *
+     * @required
+     *
+     * @throws CannotInsertRecord
+     */
+    public function setRecord(Record $record): void
+    {
+        $this->setHeader($record);
     }
 
     /**

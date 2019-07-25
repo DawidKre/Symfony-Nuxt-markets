@@ -3,7 +3,7 @@
 namespace App\BusinessLogic\Scraper\Model;
 
 /**
- * Class Record
+ * Class Record.
  */
 class Record implements RecordInterface
 {

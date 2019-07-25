@@ -36,6 +36,7 @@ class ScraperLogService
     {
         $this->scraperLog->setCsvFile($filename);
         $this->scraperLog->setMarket($market);
+        $this->scraperLog->setSuccess(true);
 
         $this->saveLog();
     }
@@ -48,6 +49,7 @@ class ScraperLogService
     {
         $this->scraperLog->setErrorMessage($errorMessage);
         $this->scraperLog->setMarket($market);
+        $this->scraperLog->setSuccess(false);
 
         $this->saveLog();
     }

@@ -6,6 +6,7 @@ use App\BusinessLogic\Scraper\Converter\ElizowkaConverter;
 use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Factory\ScrapeMarketInterface;
 use App\BusinessLogic\Scraper\Model\Record;
+use App\BusinessLogic\Scraper\Model\Unit;
 use App\BusinessLogic\Scraper\Service\CheckerService;
 use App\BusinessLogic\Scraper\Service\ScraperLogService;
 use App\BusinessLogic\SharedLogic\Service\CrawlerService;
@@ -13,9 +14,14 @@ use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
 use App\BusinessLogic\SharedLogic\Service\SlackService;
 use App\Entity\Market;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Annotations\AnnotationReader;
 use DOMElement;
 use Exception;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Class ElizowkaScraper.
@@ -30,9 +36,6 @@ class ElizowkaScraper implements ScrapeMarketInterface
 
     /** @var CrawlerService */
     private $crawlerService;
-
-    /** @var EntityManagerInterface */
-    private $entityManager;
 
     /** @var CsvWriterService */
     private $csvService;
@@ -74,6 +77,7 @@ class ElizowkaScraper implements ScrapeMarketInterface
         $this->checkerService = $checkerService;
         $this->slackService = $slackService;
         $this->scraperLogService = $scraperLogService;
+
     }
 
     /**
@@ -83,13 +87,10 @@ class ElizowkaScraper implements ScrapeMarketInterface
      */
     public function setConverter(ElizowkaConverter $converter): void
     {
-        dd(123);
         $this->converter = $converter;
     }
 
     /**
-     * @param Market $market
-     *
      * @throws ScraperException
      * @throws \Http\Client\Exception
      */
@@ -105,10 +106,7 @@ class ElizowkaScraper implements ScrapeMarketInterface
 //                return;
             }
 
-            $this->slackService->sendScraperStartScrapingMessage($this->market->getName());
             $priceStartDate = $this->getPriceStartDateFromText($mainNode->filter('small')->text());
-            $this->csvService->setHeader(new Record());
-
             $category = '';
             // TODO Refactor foreach add new functions for h2 and div ex: h2Nodes(), divNodes()
             foreach ($mainNode->children() as $node) {
@@ -127,6 +125,7 @@ class ElizowkaScraper implements ScrapeMarketInterface
                 }
             }
 
+            $this->slackService->sendScraperStartScrapingMessage($this->market->getName());
             $fileName = $this->csvService->uploadMarketCsvFile($this->market->getName());
             $this->scraperLogService->saveSuccessScraperLog($this->market, $fileName);
             $this->checkerService->updateScrapeCheck($this->market->getScraperCheck(), $mainNode->text());
@@ -172,8 +171,8 @@ class ElizowkaScraper implements ScrapeMarketInterface
     private function setRecord(DOMElement $tr, string $category, string $priceStartDate): Record
     {
         $record = new Record();
+        $this->converter = new ElizowkaConverter(new Unit());
         // TODO ADD Converter Service for that
-        dd($this->converter);
         $units = $this->converter->convertUnits($tr->childNodes[2]->textContent);
         $record->setName($tr->childNodes[1]->textContent);
         $record->setMarket($this->market->getName());

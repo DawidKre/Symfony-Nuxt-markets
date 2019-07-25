@@ -5,9 +5,13 @@ namespace App\Controller;
 use App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory;
 use App\Entity\Market;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class ScraperController.
+ */
 class ScraperController extends AbstractController
 {
     /**
@@ -17,7 +21,7 @@ class ScraperController extends AbstractController
      *
      * @return Response
      */
-    public function index(ScrapeMarketFactory $scrapeMarketFactory): Response
+    public function index(ScrapeMarketFactory $scrapeMarketFactory): JsonResponse
     {
         $markets = $this->getDoctrine()->getRepository(Market::class)->findAll();
 
@@ -25,13 +29,15 @@ class ScraperController extends AbstractController
             $scrapeMarketFactory->createScraper($market)->scrapeMarket();
         }
 
-        return new Response(['200']);
+        return new JsonResponse(['status' => 'success']);
     }
 
     /**
      * @Route("/", name="home")
+     *
+     * @return Response
      */
-    public function home()
+    public function home(): Response
     {
         return $this->redirect('/api');
     }
