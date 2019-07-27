@@ -2,38 +2,47 @@
 
 namespace App\Controller;
 
-use App\BusinessLogic\Scraper\Service\CheckerService;
-use App\BusinessLogic\Scraper\Service\ScraperManager;
+use App\BusinessLogic\Scraper\Exception\MarketNotScrapedException;
+use App\BusinessLogic\Scraper\Exception\ScraperException;
+use App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory;
 use App\Entity\Market;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**  */
+/**
+ * Class ScraperController.
+ */
 class ScraperController extends AbstractController
 {
     /**
      * @Route("/scraper", name="sraper")
      *
-     * @param ScraperManager $scraper
+     * @param ScrapeMarketFactory $scrapeMarketFactory
      *
-     * @return Response
-     * @throws \League\Csv\CannotInsertRecord
+     * @return JsonResponse
+     *
+     * @throws MarketNotScrapedException
+     * @throws ScraperException
      */
-    public function index(CheckerService $checkerService, ScraperManager $scraperManager): Response
+    public function index(ScrapeMarketFactory $scrapeMarketFactory): JsonResponse
     {
-        dd($scraperManager->scrapeMarkets());
-        $market = $this->getDoctrine()->getRepository(Market::class)->findOneBy([]);
-        $market->getScraperChecks()->last();
-//        $scraper->scrapeMarkets();
+        $markets = $this->getDoctrine()->getRepository(Market::class)->findAll();
 
-        return new Response(['200']);
+        foreach ($markets as $market) {
+            $scrapeMarketFactory->createScraper($market)->scrapeMarket();
+        }
+
+        return new JsonResponse(['status' => 'success']);
     }
 
     /**
      * @Route("/", name="home")
+     *
+     * @return Response
      */
-    public function home()
+    public function home(): Response
     {
         return $this->redirect('/api');
     }

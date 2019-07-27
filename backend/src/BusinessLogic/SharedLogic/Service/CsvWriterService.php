@@ -2,69 +2,91 @@
 
 namespace App\BusinessLogic\SharedLogic\Service;
 
+use App\BusinessLogic\Scraper\Model\Record;
 use App\BusinessLogic\Scraper\Model\RecordInterface;
+use DateTime;
 use League\Csv\CannotInsertRecord;
 use League\Csv\Writer;
 use SplTempFileObject;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class CsvWriterService
+ * Class CsvWriterService.
  */
 class CsvWriterService
 {
-    /** @var Filesystem */
-    private $filesystem;
-
     /** @var Writer */
     private $writer;
 
+    /** @var UploadService */
+    private $uploadService;
+
     /**
-     * @param Filesystem $filesystem
+     * @param UploadService $uploadService
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(UploadService $uploadService)
     {
-        $this->filesystem = $filesystem;
         $this->writer = Writer::createFromFileObject(new SplTempFileObject());
+        $this->uploadService = $uploadService;
     }
 
     /**
-     * @param string $uploadPath
+     * @param Record $record
+     *
+     * @required
+     *
+     * @throws CannotInsertRecord
+     */
+    public function setRecord(Record $record): void
+    {
+        $this->setHeader($record);
+    }
+
+    /**
+     * @param Record[] $records
+     *
+     * @throws CannotInsertRecord
+     */
+    public function addRecords(array $records): void
+    {
+        foreach ($records as $record) {
+            $this->addRecord($record);
+        }
+    }
+
+    /**
+     * @param Record[] $records
+     * @param string   $marketName
      *
      * @return string
+     *
+     * @throws CannotInsertRecord
      */
-    public function uploadCsvFile(string $uploadPath): string
+    public function uploadMarketCsvFile(array $records, string $marketName): string
     {
-        $this->filesystem->appendToFile($uploadPath, $this->writer->getContent());
+        $this->addRecords($records);
+        $date = (new DateTime())->format('Y-m-d H:i:s');
+        $fileName = "{$marketName}/import_{$date}.csv";
 
-        return $uploadPath;
+        return $this->uploadService->uploadFile($fileName, $this->writer->getContent());
     }
 
     /**
      * @param RecordInterface $record
      *
-     * @return CsvWriterService
-     *
      * @throws CannotInsertRecord
      */
-    public function setHeader(RecordInterface $record): self
+    public function setHeader(RecordInterface $record): void
     {
         $this->writer->insertOne($record->getParametersAsArray());
-
-        return $this;
     }
 
     /**
      * @param RecordInterface $record
      *
-     * @return CsvWriterService
-     *
      * @throws CannotInsertRecord
      */
-    public function addRecord(RecordInterface $record): self
+    public function addRecord(RecordInterface $record): void
     {
         $this->writer->insertOne($record->getAsArray());
-
-        return $this;
     }
 }

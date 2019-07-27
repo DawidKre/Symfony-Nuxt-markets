@@ -6,12 +6,10 @@ use App\BusinessLogic\SharedLogic\Service\CsvReaderService;
 use App\Entity\MarketProduct;
 use App\Entity\Prices;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use League\Csv\Exception;
 
 /**
- * Class ImportService
+ * Class ImportService.
  */
 class ImportService
 {
@@ -23,7 +21,8 @@ class ImportService
 
     /**
      * ImportService constructor.
-     * @param CsvReaderService $csvReaderService
+     *
+     * @param CsvReaderService       $csvReaderService
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(CsvReaderService $csvReaderService, EntityManagerInterface $entityManager)
@@ -35,8 +34,6 @@ class ImportService
     /**
      * @param string $file
      *
-     * @throws ORMException
-     * @throws OptimisticLockException
      * @throws Exception
      */
     public function import(string $file)
@@ -49,7 +46,6 @@ class ImportService
             $marketProduct = $this->entityManager
                 ->getRepository(MarketProduct::class)
                 ->findOrCreateNewByName($record['name']);
-
 
             $prices = new Prices();
         }

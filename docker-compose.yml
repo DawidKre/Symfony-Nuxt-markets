@@ -70,17 +70,17 @@ services:
     networks:
       - application
 
-  nuxt:
-    image: kreciszd/markets_nuxt:1.0
-    container_name: markets_nuxt
+  quasar:
+    image: kreciszd/markets_quasar:1.0
+    container_name: markets_quasar
     build:
       context: ./frontend
-      dockerfile: docker/nuxt/Dockerfile
+      dockerfile: docker/quasar/Dockerfile
     tty: true
     ports:
-      - ${NUXT_PORT}:3000
+      - ${QUASAR_PORT}:8080
     environment:
-      - VIRTUAL_HOST=${NUXT_VHOST}
+      - VIRTUAL_HOST=${QUASAR_VHOST}
     restart: always
     command:
       "yarn run dev"
@@ -89,7 +89,7 @@ services:
     networks:
       application:
         aliases:
-          - ${NUXT_VHOST}
+          - ${QUASAR_VHOST}
 volumes:
   postgres:
     driver: local

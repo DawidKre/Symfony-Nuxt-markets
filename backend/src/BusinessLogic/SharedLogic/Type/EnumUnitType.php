@@ -6,11 +6,11 @@ use App\BusinessLogic\SharedLogic\Model\EnumTypeName;
 use App\BusinessLogic\SharedLogic\Model\UnitType;
 
 /**
- * Class EnumUnitType
+ * Class EnumUnitType.
  */
 class EnumUnitType extends AbstractEnumType
 {
-    /** @var string  */
+    /** @var string */
     protected $name = EnumTypeName::UNIT_TYPE;
 
     /**

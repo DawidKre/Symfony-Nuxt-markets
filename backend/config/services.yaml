@@ -14,7 +14,6 @@ services:
       # W dowolnym servicie mozemy wstrzyknac parametr $projectDir zawierajacy aktualna sciezke do projektu na serwerze
       $scraperLogger: '@monolog.logger.scraper'
       $importerLogger: '@monolog.logger.importer'
-      $projectDir: '%kernel.project_dir%'
       Nexy\Slack\Client: '@nexy_slack.client'
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -28,7 +27,7 @@ services:
     resource: '../src/Controller'
     tags: ['controller.service_arguments']
 
-  App\BusinessLogic\Scraper\EventSubscriber\MarketSubscriber:
+  App\BusinessLogic\Scraper\EventSubscriber\CreateMarketScraperCheckSubscriber:
     tags:
       - { name: doctrine.event_listener, event: postPersist }
 
@@ -37,3 +36,46 @@ services:
   Goutte\Client:
   GuzzleHttp\Client:
   League\Csv\Writer:
+
+  App\BusinessLogic\SharedLogic\Service\UploadService:
+    arguments:
+      $uploadPath: '%kernel.project_dir%/var/storage/csv'
+
+  app.upload_service.logger:
+    class: App\BusinessLogic\SharedLogic\Service\UploadService
+    arguments:
+      $uploadPath: '%kernel.project_dir%/var/logs'
+
+  app.csv_writer_service.scraper:
+    class: App\BusinessLogic\SharedLogic\Service\CsvWriterService
+    calls:
+      - method: setRecord
+        arguments:
+          $record: '@App\BusinessLogic\Scraper\Model\Record'
+
+  App\BusinessLogic\Scraper\EventSubscriber\MarketScrapedSubscriber:
+    arguments:
+      $csvService: '@app.csv_writer_service.scraper'
+
+  app.scraper_factory:
+    class: App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory
+    arguments: [
+      App\BusinessLogic\SharedLogic\Service\CrawlerService,
+      App\BusinessLogic\Scraper\Service\CheckerService
+      ]
+
+  app.scraper.converter_elizowka:
+    class: App\BusinessLogic\Scraper\Converter\ElizowkaConverter
+
+  App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper:
+    factory: ['@app.scraper_factory', createScraper]
+    properties:
+      converter: 'app.scraper.converter_elizowka'
+    tags:
+      - { name: 'app.scraper'}
+
+  app.scraper_bronisze:
+    class: App\BusinessLogic\Scraper\Factory\MarketScrapers\BroniszeScraper
+    factory: ['@app.scraper_factory', createScraper]
+    tags:
+      - { name: 'app.scraper'}
