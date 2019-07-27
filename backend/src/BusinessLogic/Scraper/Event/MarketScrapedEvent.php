@@ -2,6 +2,7 @@
 
 namespace App\BusinessLogic\Scraper\Event;
 
+use App\BusinessLogic\Scraper\Model\Record;
 use App\Entity\Market;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -13,18 +14,19 @@ class MarketScrapedEvent extends Event
     /** @var Market */
     private $market;
 
-    /** @var string */
-    private $fileName;
+    /** @var Record[] */
+    private $records;
 
     /**
      * MarketScrapedEvent constructor.
-     * @param Market $market
-     * @param string $fileName
+     *
+     * @param Market   $market
+     * @param Record[] $records
      */
-    public function __construct(Market $market, string $fileName)
+    public function __construct(Market $market, array $records)
     {
         $this->market = $market;
-        $this->fileName = $fileName;
+        $this->records = $records;
     }
 
     /**
@@ -36,10 +38,10 @@ class MarketScrapedEvent extends Event
     }
 
     /**
-     * @return string
+     * @return Record[]
      */
-    public function getFileName(): string
+    public function getRecords(): array
     {
-        return $this->fileName;
+        return $this->records;
     }
 }

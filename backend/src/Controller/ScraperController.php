@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\BusinessLogic\Scraper\Exception\MarketNotScrapedException;
+use App\BusinessLogic\Scraper\Exception\ScraperException;
 use App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory;
 use App\Entity\Market;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +21,10 @@ class ScraperController extends AbstractController
      *
      * @param ScrapeMarketFactory $scrapeMarketFactory
      *
-     * @return Response
+     * @return JsonResponse
+     *
+     * @throws MarketNotScrapedException
+     * @throws ScraperException
      */
     public function index(ScrapeMarketFactory $scrapeMarketFactory): JsonResponse
     {

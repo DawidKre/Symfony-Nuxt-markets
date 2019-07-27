@@ -18,33 +18,17 @@ class ScrapeMarketFactory
     /** @var CrawlerService */
     private $crawlerService;
 
-    /** @var CsvWriterService */
-    private $csvService;
-
     /** @var CheckerService */
     private $checkerService;
 
     /**
-     * @var EventDispatcherInterface
+     * @param CrawlerService $crawlerService
+     * @param CheckerService $checkerService
      */
-    private $eventDispatcher;
-
-    /**
-     * @param CrawlerService           $crawlerService
-     * @param CsvWriterService         $csvService
-     * @param CheckerService           $checkerService
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function __construct(
-        CrawlerService $crawlerService,
-        CsvWriterService $csvService,
-        CheckerService $checkerService,
-        EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(CrawlerService $crawlerService, CheckerService $checkerService)
+    {
         $this->crawlerService = $crawlerService;
-        $this->csvService = $csvService;
         $this->checkerService = $checkerService;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -54,23 +38,12 @@ class ScrapeMarketFactory
      */
     public function createScraper(Market $market): ScrapeMarketInterface
     {
+        // TODO change setters injection
         switch ($market->getName()) {
             case MarketNameType::ELIZOWKA_MARKET:
-                return new ElizowkaScraper(
-                    $market,
-                    $this->crawlerService,
-                    $this->csvService,
-                    $this->checkerService,
-                    $this->eventDispatcher
-                );
+                return new ElizowkaScraper($market, $this->crawlerService, $this->checkerService);
             case MarketNameType::BRONISZE_MARKET:
-                return new ElizowkaScraper(
-                    $market,
-                    $this->crawlerService,
-                    $this->csvService,
-                    $this->checkerService,
-                    $this->eventDispatcher
-                );
+                return new ElizowkaScraper($market, $this->crawlerService, $this->checkerService);
         }
     }
 }

@@ -37,8 +37,7 @@ services:
   GuzzleHttp\Client:
   League\Csv\Writer:
 
-  app.upload_service.scraper:
-    class: App\BusinessLogic\SharedLogic\Service\UploadService
+  App\BusinessLogic\SharedLogic\Service\UploadService:
     arguments:
       $uploadPath: '%kernel.project_dir%/var/storage/csv'
 
@@ -47,32 +46,31 @@ services:
     arguments:
       $uploadPath: '%kernel.project_dir%/var/logs'
 
-  App\BusinessLogic\SharedLogic\Service\CsvWriterService:
-    arguments:
-      $uploadService: '@app.upload_service.scraper'
-
   app.csv_writer_service.scraper:
     class: App\BusinessLogic\SharedLogic\Service\CsvWriterService
     calls:
       - method: setRecord
         arguments:
-          $record: App\BusinessLogic\Scraper\Model\Record
+          $record: '@App\BusinessLogic\Scraper\Model\Record'
+
+  App\BusinessLogic\Scraper\EventSubscriber\MarketScrapedSubscriber:
+    arguments:
+      $csvService: '@app.csv_writer_service.scraper'
 
   app.scraper_factory:
     class: App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory
     arguments: [
       App\BusinessLogic\SharedLogic\Service\CrawlerService,
-      '@app.csv_writer_service.scraper',
-      App\BusinessLogic\Scraper\Service\CheckerService,
-      Symfony\Component\EventDispatcher\EventDispatcherInterface
+      App\BusinessLogic\Scraper\Service\CheckerService
       ]
+
+  app.scraper.converter_elizowka:
+    class: App\BusinessLogic\Scraper\Converter\ElizowkaConverter
 
   App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper:
     factory: ['@app.scraper_factory', createScraper]
-    calls:
-      - method: setConverter
-        arguments:
-          $converter: App\BusinessLogic\Scraper\Converter\ElizowkaConverter
+    properties:
+      converter: 'app.scraper.converter_elizowka'
     tags:
       - { name: 'app.scraper'}
 

@@ -7,7 +7,13 @@ namespace App\BusinessLogic\Scraper\Model;
  */
 interface RecordInterface
 {
+    /**
+     * @return array
+     */
     public function getAsArray(): array;
 
+    /**
+     * @return array
+     */
     public function getParametersAsArray(): array;
 }

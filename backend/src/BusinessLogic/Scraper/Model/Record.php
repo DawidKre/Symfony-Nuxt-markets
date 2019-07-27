@@ -59,7 +59,7 @@ class Record implements RecordInterface
      */
     public function getParametersAsArray(): array
     {
-        return array_keys(get_object_vars($this));
+        return array_keys($this->getAsArray());
     }
 
     /**

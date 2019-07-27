@@ -13,13 +13,18 @@ class MarketNotScrapedEvent extends Event
     /** @var Market */
     private $market;
 
+    /** @var string */
+    private $errorMessage;
+
     /**
      * MarketScrapedEvent constructor.
      * @param Market $market
+     * @param string $errorMessage
      */
-    public function __construct(Market $market)
+    public function __construct(Market $market, string $errorMessage)
     {
         $this->market = $market;
+        $this->errorMessage = $errorMessage;
     }
 
     /**
@@ -28,5 +33,13 @@ class MarketNotScrapedEvent extends Event
     public function getMarket(): Market
     {
         return $this->market;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
     }
 }

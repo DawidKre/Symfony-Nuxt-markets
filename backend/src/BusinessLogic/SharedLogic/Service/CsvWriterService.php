@@ -42,14 +42,28 @@ class CsvWriterService
     }
 
     /**
-     * @param string $marketName
+     * @param Record[] $records
+     *
+     * @throws CannotInsertRecord
+     */
+    public function addRecords(array $records): void
+    {
+        foreach ($records as $record) {
+            $this->addRecord($record);
+        }
+    }
+
+    /**
+     * @param Record[] $records
+     * @param string   $marketName
      *
      * @return string
      *
-     * @throws \Exception
+     * @throws CannotInsertRecord
      */
-    public function uploadMarketCsvFile(string $marketName): string
+    public function uploadMarketCsvFile(array $records, string $marketName): string
     {
+        $this->addRecords($records);
         $date = (new DateTime())->format('Y-m-d H:i:s');
         $fileName = "{$marketName}/import_{$date}.csv";
 
