@@ -14,9 +14,6 @@ class ScraperLogService
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var ScraperLog */
-    private $scraperLog;
-
     /**
      * ImportService constructor.
      *
@@ -25,41 +22,50 @@ class ScraperLogService
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->scraperLog = new ScraperLog();
     }
 
     /**
      * @param Market $market
      * @param string $filename
+     *
+     * @return ScraperLog
      */
-    public function saveSuccessScraperLog(Market $market, string $filename): void
+    public function saveSuccessScraperLog(Market $market, string $filename): ScraperLog
     {
-        $this->scraperLog->setCsvFile($filename);
-        $this->scraperLog->setMarket($market);
-        $this->scraperLog->setSuccess(true);
+        $scraperLog = new ScraperLog();
+        $scraperLog->setCsvFile($filename);
+        $scraperLog->setMarket($market);
+        $scraperLog->setSuccess(true);
+        $this->saveLog($scraperLog);
 
-        $this->saveLog();
+        return $scraperLog;
     }
 
     /**
      * @param Market $market
      * @param string $errorMessage
+     *
+     * @return ScraperLog
      */
-    public function saveFailedScraperLog(Market $market, string $errorMessage): void
+    public function saveFailedScraperLog(Market $market, string $errorMessage): ScraperLog
     {
-        $this->scraperLog->setErrorMessage($errorMessage);
-        $this->scraperLog->setMarket($market);
-        $this->scraperLog->setSuccess(false);
+        $scraperLog = new ScraperLog();
+        $scraperLog->setErrorMessage($errorMessage);
+        $scraperLog->setMarket($market);
+        $scraperLog->setSuccess(false);
 
-        $this->saveLog();
+        $this->saveLog($scraperLog);
+
+        return $scraperLog;
     }
 
     /**
      * Save log to database.
+     * @param ScraperLog $scraperLog
      */
-    private function saveLog(): void
+    private function saveLog(ScraperLog $scraperLog): void
     {
-        $this->entityManager->persist($this->scraperLog);
+        $this->entityManager->persist($scraperLog);
         $this->entityManager->flush();
     }
 }

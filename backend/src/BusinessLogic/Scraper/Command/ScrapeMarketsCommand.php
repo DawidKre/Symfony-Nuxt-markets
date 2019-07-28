@@ -41,8 +41,11 @@ class ScrapeMarketsCommand extends Command
      * @param ScrapeMarketFactory      $scraperManager
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(EntityManagerInterface $entityManager, ScrapeMarketFactory $scraperManager, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ScrapeMarketFactory $scraperManager,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         parent::__construct();
         $this->scraperManager = $scraperManager;
         $this->entityManager = $entityManager;

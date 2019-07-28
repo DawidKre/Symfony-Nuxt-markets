@@ -38,6 +38,11 @@ class ScraperLog extends AbstractBaseEntity
     private $errorMessage;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\ImporterLog", mappedBy="scraperLog", cascade={"persist", "remove"})
+     */
+    private $importerLog;
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
@@ -121,6 +126,32 @@ class ScraperLog extends AbstractBaseEntity
     public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
+
+        return $this;
+    }
+
+    /**
+     * @return ImporterLog|null
+     */
+    public function getImporterLog(): ?ImporterLog
+    {
+        return $this->importerLog;
+    }
+
+    /**
+     * @param ImporterLog|null $importerLog
+     *
+     * @return ScraperLog
+     */
+    public function setImporterLog(?ImporterLog $importerLog): self
+    {
+        $this->importerLog = $importerLog;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newScraperLog = null === $importerLog ? null : $this;
+        if ($newScraperLog !== $importerLog->getScraperLog()) {
+            $importerLog->setScraperLog($newScraperLog);
+        }
 
         return $this;
     }

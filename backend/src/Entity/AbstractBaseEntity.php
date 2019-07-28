@@ -3,26 +3,14 @@
 namespace App\Entity;
 
 use DateTimeInterface;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Class BaseEntity
+ * Class BaseEntity.
  */
 abstract class AbstractBaseEntity
 {
-    /**
-     * @Gedmo\Blameable(on="create")
-     *
-     * @ORM\Column(nullable=true)
-     */
-    protected $createdBy;
-    /**
-     * @Gedmo\Blameable(on="update")
-     *
-     * @ORM\Column(nullable=true)
-     */
-    protected $updatedBy;
     /**
      * @Gedmo\Timestampable(on="create")
      *
@@ -39,47 +27,6 @@ abstract class AbstractBaseEntity
      * @ORM\Column(type="datetime", nullable=true)
      */
     protected $deletedAt;
-
-
-    /**
-     * @return string
-     */
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    /**
-     * @param string $createdBy
-     *
-     * @return $this
-     */
-    public function setCreatedBy($createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @param string $updatedBy
-     *
-     * @return $this
-     */
-    public function setUpdatedBy($updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
 
     /**
      * @return DateTimeInterface

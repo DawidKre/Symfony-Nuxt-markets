@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\BusinessLogic\Scraper\Exception\MarketNotScrapedException;
-use App\BusinessLogic\Scraper\Exception\ScraperException;
-use App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory;
-use App\Entity\Market;
+use App\BusinessLogic\Importer\Service\ImportService;
+use App\Entity\ImporterLog;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,19 +18,16 @@ class ScraperController extends AbstractController
     /**
      * @Route("/scraper", name="sraper")
      *
-     * @param ScrapeMarketFactory $scrapeMarketFactory
-     *
+     * @param ImportService $importService
      * @return JsonResponse
      *
-     * @throws MarketNotScrapedException
-     * @throws ScraperException
      */
-    public function index(ScrapeMarketFactory $scrapeMarketFactory): JsonResponse
+    public function index(ImportService $importService, EntityManagerInterface $entityManager): JsonResponse
     {
-        $markets = $this->getDoctrine()->getRepository(Market::class)->findAll();
+        $importerLogs = $entityManager->getRepository(ImporterLog::class)->getNotImported();
 
-        foreach ($markets as $market) {
-            $scrapeMarketFactory->createScraper($market)->scrapeMarket();
+        foreach ($importerLogs as $importerLog) {
+            $importService->import($importerLog);
         }
 
         return new JsonResponse(['status' => 'success']);

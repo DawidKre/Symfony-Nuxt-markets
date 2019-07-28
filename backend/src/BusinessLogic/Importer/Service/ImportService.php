@@ -3,10 +3,11 @@
 namespace App\BusinessLogic\Importer\Service;
 
 use App\BusinessLogic\SharedLogic\Service\CsvReaderService;
-use App\Entity\MarketProduct;
-use App\Entity\Prices;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\ImporterLog;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use League\Csv\Exception;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
  * Class ImportService.
@@ -16,38 +17,35 @@ class ImportService
     /** @var CsvReaderService */
     private $csvReaderService;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    /** @var MarketProductService */
+    private $marketProductService;
 
     /**
      * ImportService constructor.
      *
-     * @param CsvReaderService       $csvReaderService
-     * @param EntityManagerInterface $entityManager
+     * @param CsvReaderService     $csvReaderService
+     * @param MarketProductService $marketProductService
      */
-    public function __construct(CsvReaderService $csvReaderService, EntityManagerInterface $entityManager)
+    public function __construct(CsvReaderService $csvReaderService, MarketProductService $marketProductService)
     {
         $this->csvReaderService = $csvReaderService;
-        $this->entityManager = $entityManager;
+        $this->marketProductService = $marketProductService;
     }
 
     /**
-     * @param string $file
+     * @param ImporterLog $importerLog
      *
      * @throws Exception
+     * @throws ExceptionInterface
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function import(string $file)
+    public function import(ImporterLog $importerLog)
     {
-        $reader = $this->csvReaderService->readFile($file);
-        $header = $this->csvReaderService->getHeader();
-        $records = $this->csvReaderService->getRecords();
+        $records = $this->csvReaderService->gerRecordsFromFile($importerLog->getScraperLog()->getCsvFile());
 
         foreach ($records as $record) {
-            $marketProduct = $this->entityManager
-                ->getRepository(MarketProduct::class)
-                ->findOrCreateNewByName($record['name']);
-
-            $prices = new Prices();
+            $marketProduct = $this->marketProductService->getMarketProductByName($record);
         }
     }
 }
