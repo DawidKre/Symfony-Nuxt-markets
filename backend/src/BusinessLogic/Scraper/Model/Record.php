@@ -19,26 +19,26 @@ class Record implements RecordInterface
     /** @var string */
     private $unit;
 
-    /** @var float */
+    /** @var string */
     private $quantity;
 
-    /** @var int */
+    /** @var string */
     private $amount;
 
-    /** @var float */
+    /** @var string */
     private $priceMin;
 
-    /** @var float */
+    /** @var string */
     private $priceMax;
 
-    /** @var float */
+    /** @var string */
     private $priceAvg;
 
-    /** @var float */
+    /** @var string */
     private $priceDifference;
 
-    /** @var float */
-    private $priceAvgPrevious;
+    /** @var string */
+    private $priceDifferencePrevious;
 
     /** @var string */
     private $scrapeDate;
@@ -92,8 +92,6 @@ class Record implements RecordInterface
 
     /**
      * @param string $market
-     *
-     * @return void
      */
     public function setMarket(string $market): void
     {
@@ -110,8 +108,6 @@ class Record implements RecordInterface
 
     /**
      * @param string $category
-     *
-     * @return void
      */
     public function setCategory(string $category): void
     {
@@ -128,8 +124,6 @@ class Record implements RecordInterface
 
     /**
      * @param string $unit
-     *
-     * @return void
      */
     public function setUnit(string $unit): void
     {
@@ -141,13 +135,11 @@ class Record implements RecordInterface
      */
     public function getQuantity(): float
     {
-        return $this->quantity;
+        return (float) $this->quantity;
     }
 
     /**
      * @param float $quantity
-     *
-     * @return void
      */
     public function setQuantity(float $quantity): void
     {
@@ -159,13 +151,11 @@ class Record implements RecordInterface
      */
     public function getAmount(): int
     {
-        return $this->amount;
+        return (int) $this->amount;
     }
 
     /**
      * @param int $amount
-     *
-     * @return void
      */
     public function setAmount(int $amount): void
     {
@@ -177,13 +167,11 @@ class Record implements RecordInterface
      */
     public function getPriceMin(): float
     {
-        return $this->priceMin;
+        return (float) $this->priceMin;
     }
 
     /**
      * @param float $priceMin
-     *
-     * @return void
      */
     public function setPriceMin(float $priceMin): void
     {
@@ -195,13 +183,11 @@ class Record implements RecordInterface
      */
     public function getPriceMax(): float
     {
-        return $this->priceMax;
+        return (float) $this->priceMax;
     }
 
     /**
      * @param float $priceMax
-     *
-     * @return void
      */
     public function setPriceMax(float $priceMax): void
     {
@@ -213,13 +199,11 @@ class Record implements RecordInterface
      */
     public function getPriceAvg(): float
     {
-        return $this->priceAvg;
+        return (float) $this->priceAvg;
     }
 
     /**
      * @param float $priceAvg
-     *
-     * @return void
      */
     public function setPriceAvg(float $priceAvg): void
     {
@@ -231,13 +215,11 @@ class Record implements RecordInterface
      */
     public function getPriceDifference(): float
     {
-        return $this->priceDifference;
+        return (float) $this->priceDifference;
     }
 
     /**
      * @param float $priceDifference
-     *
-     * @return void
      */
     public function setPriceDifference(float $priceDifference): void
     {
@@ -247,19 +229,17 @@ class Record implements RecordInterface
     /**
      * @return float
      */
-    public function getPriceAvgPrevious(): float
+    public function getPriceDifferencePrevious(): float
     {
-        return $this->priceAvgPrevious;
+        return (float) $this->priceDifferencePrevious;
     }
 
     /**
-     * @param float $priceAvgPrevious
-     *
-     * @return void
+     * @param float $priceDifferencePrevious
      */
-    public function setPriceAvgPrevious(float $priceAvgPrevious): void
+    public function setPriceDifferencePrevious(float $priceDifferencePrevious): void
     {
-        $this->priceAvgPrevious = $priceAvgPrevious;
+        $this->priceDifferencePrevious = $priceDifferencePrevious;
     }
 
     /**
@@ -272,14 +252,11 @@ class Record implements RecordInterface
 
     /**
      * @param string $scrapeDate
-     *
-     * @return void
      */
     public function setScrapeDate(string $scrapeDate): void
     {
         $this->scrapeDate = $scrapeDate;
     }
-
 
     /**
      * @return string
@@ -291,8 +268,6 @@ class Record implements RecordInterface
 
     /**
      * @param string $priceStartDate
-     *
-     * @return void
      */
     public function setPriceStartDate(string $priceStartDate): void
     {

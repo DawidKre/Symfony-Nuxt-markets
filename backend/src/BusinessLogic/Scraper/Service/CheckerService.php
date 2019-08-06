@@ -32,9 +32,28 @@ class CheckerService
     public function checkMarketPrices(Market $market, string $pricesText): bool
     {
         $marketLastScrapeCheck = $market->getScraperCheck();
+        if (!$marketLastScrapeCheck) {
+            $marketLastScrapeCheck = $this->createNewScraperCheck($market);
+        }
         $pricesHashText = $this->hashText($pricesText);
 
-        return $marketLastScrapeCheck && ($marketLastScrapeCheck->getPricesHash() === $pricesHashText);
+        return $marketLastScrapeCheck->getPricesHash() === $pricesHashText;
+    }
+
+    /**
+     * @param Market $market
+     *
+     * @return ScraperCheck
+     */
+    public function createNewScraperCheck(Market $market): ScraperCheck
+    {
+        $scraperCheck = new ScraperCheck();
+        $scraperCheck->setMarket($market);
+
+        $this->entityManager->persist($scraperCheck);
+        $this->entityManager->flush();
+
+        return $scraperCheck;
     }
 
     /**

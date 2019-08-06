@@ -31,6 +31,10 @@ services:
     tags:
       - { name: doctrine.event_listener, event: postPersist }
 
+  App\BusinessLogic\Scraper\EventSubscriber\SuccessScraperLogCreatedSubscriber:
+    tags:
+      - { name: doctrine.event_listener, event: postPersist }
+
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
   Goutte\Client:
@@ -53,7 +57,7 @@ services:
         arguments:
           $record: '@App\BusinessLogic\Scraper\Model\Record'
 
-  App\BusinessLogic\Scraper\EventSubscriber\MarketScrapedSubscriber:
+  App\BusinessLogic\Scraper\EventSubscriber\ScraperSubscriber:
     arguments:
       $csvService: '@app.csv_writer_service.scraper'
 
@@ -64,18 +68,14 @@ services:
       App\BusinessLogic\Scraper\Service\CheckerService
       ]
 
-  app.scraper.converter_elizowka:
-    class: App\BusinessLogic\Scraper\Converter\ElizowkaConverter
-
   App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper:
     factory: ['@app.scraper_factory', createScraper]
     properties:
-      converter: 'app.scraper.converter_elizowka'
+      converter: App\BusinessLogic\Scraper\Converter\ElizowkaConverter
     tags:
       - { name: 'app.scraper'}
 
-  app.scraper_bronisze:
-    class: App\BusinessLogic\Scraper\Factory\MarketScrapers\BroniszeScraper
+  App\BusinessLogic\Scraper\Factory\MarketScrapers\BroniszeScraper:
     factory: ['@app.scraper_factory', createScraper]
     tags:
       - { name: 'app.scraper'}

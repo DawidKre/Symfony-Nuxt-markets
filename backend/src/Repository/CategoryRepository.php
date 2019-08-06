@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -29,20 +31,16 @@ class CategoryRepository extends ServiceEntityRepository
      *
      * @return Category
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function findOrCreateNewByName(string $name): Category
+    public function createNewCategoryByName(string $name): Category
     {
-        $category = $this->findOneBy(['name' => $name]);
+        $category = new Category();
+        $category->setName($name);
 
-        if (!$category) {
-            $brewer = new Category();
-            $brewer->setName($name);
-
-            $this->_em->persist($brewer);
-            $this->_em->flush();
-        }
+        $this->_em->persist($category);
+        $this->_em->flush();
 
         return $category;
     }
