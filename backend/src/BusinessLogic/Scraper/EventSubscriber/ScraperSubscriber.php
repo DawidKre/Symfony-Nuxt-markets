@@ -2,6 +2,7 @@
 
 namespace App\BusinessLogic\Scraper\EventSubscriber;
 
+use App\BusinessLogic\Importer\Event\StartImportingScrapedMarketsEvent;
 use App\BusinessLogic\Scraper\Event\MarketNotScrapedEvent;
 use App\BusinessLogic\Scraper\Event\MarketScrapedEvent;
 use App\BusinessLogic\Scraper\Event\MarketScrapingErrorEvent;
@@ -94,6 +95,7 @@ class ScraperSubscriber implements EventSubscriberInterface
     {
         $this->message = ScrapingStatus::SCRAPER_FINISHED_SCRAPING;
         $this->scrapingProcessChanged();
+        $this->eventDispatcher->dispatch(new StartImportingScrapedMarketsEvent());
     }
 
     /**
@@ -149,11 +151,9 @@ class ScraperSubscriber implements EventSubscriberInterface
     private function marketScraped(Market $market, array $records): void
     {
         $fileName = $this->csvService->uploadMarketCsvFile($records, $market->getName());
-        $scraperLog = $this->scraperLogService->saveSuccessScraperLog($market, $fileName);
+        $this->scraperLogService->saveSuccessScraperLog($market, $fileName);
         $this->slackService->sendMessage($this->message);
         $this->scraperLogger->info($this->message);
-
-//        $this->eventDispatcher->dispatch(new StartImportScrapedMarketEvent($scraperLog));
     }
 
     /**

@@ -15,16 +15,22 @@ abstract class AbstractBaseEntity
      * @Gedmo\Timestampable(on="create")
      *
      * @ORM\Column(type="datetime")
+     *
+     * @var DateTimeInterface
      */
     protected $createdAt;
     /**
      * @Gedmo\Timestampable(on="update")
      *
      * @ORM\Column(type="datetime")
+     *
+     * @var DateTimeInterface
      */
     protected $updatedAt;
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     *
+     * @var DateTimeInterface
      */
     protected $deletedAt;
 

@@ -13,57 +13,69 @@ class ScraperLog extends AbstractBaseEntity
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *
+     * @var int
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Market", inversedBy="scraperLogs")
      * @ORM\JoinColumn(nullable=false)
+     *
+     * @var Market
      */
     private $market;
 
     /**
      * @ORM\Column(type="boolean")
+     *
+     * @var bool
      */
     private $success;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @var string
      */
     private $csvFile;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @var string
      */
     private $errorMessage;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\ImporterLog", mappedBy="scraperLog", cascade={"persist", "remove"})
+     *
+     * @var ImporterLog
      */
     private $importerLog;
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * @return Market|null
+     * @return Market
      */
-    public function getMarket(): ?Market
+    public function getMarket(): Market
     {
         return $this->market;
     }
 
     /**
-     * @param Market|null $market
+     * @param Market $market
      *
      * @return ScraperLog
      */
-    public function setMarket(?Market $market): self
+    public function setMarket(Market $market): self
     {
         $this->market = $market;
 
@@ -131,19 +143,19 @@ class ScraperLog extends AbstractBaseEntity
     }
 
     /**
-     * @return ImporterLog|null
+     * @return ImporterLog
      */
-    public function getImporterLog(): ?ImporterLog
+    public function getImporterLog(): ImporterLog
     {
         return $this->importerLog;
     }
 
     /**
-     * @param ImporterLog|null $importerLog
+     * @param ImporterLog $importerLog
      *
      * @return ScraperLog
      */
-    public function setImporterLog(?ImporterLog $importerLog): self
+    public function setImporterLog(ImporterLog $importerLog): self
     {
         $this->importerLog = $importerLog;
 

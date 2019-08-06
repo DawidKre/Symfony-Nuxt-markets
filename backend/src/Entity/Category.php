@@ -18,16 +18,22 @@ class Category extends AbstractBaseEntity
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     *
+     * @var int
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @var string
      */
     private $name;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\MarketProduct", mappedBy="category")
+     *
+     * @var MarketProduct
      */
     private $marketProducts;
 
@@ -40,17 +46,17 @@ class Category extends AbstractBaseEntity
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id ;
+        return $this->id;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }

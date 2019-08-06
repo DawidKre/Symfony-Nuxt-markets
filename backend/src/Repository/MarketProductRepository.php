@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\BusinessLogic\Scraper\Model\Record;
+use App\Entity\Category;
 use App\Entity\Market;
 use App\Entity\MarketProduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -49,21 +50,24 @@ class MarketProductRepository extends ServiceEntityRepository
     public function createNewMarketProduct(Record $record): MarketProduct
     {
         $market = $this->_em->getRepository(Market::class)->findOneBy(['name' => $record->getMarket()]);
-        $marketProduct = new MarketProduct();
+        $category = $this->_em->getRepository(Category::class)->findOneBy(['name' => $record->getCategory()]);
 
-        $marketProduct->setName($record->getName());
+        if (!$category) {
+            $category = $this->_em->getRepository(Category::class)->createNewCategoryByName($record->getCategory());
+        }
+        $marketProduct = new MarketProduct();
         $marketProduct->setMarket($market);
+        $marketProduct->setCategory($category);
+        $marketProduct->setName($record->getName());
         $marketProduct->setAmount($record->getAmount());
         $marketProduct->setQuantity($record->getQuantity());
         $marketProduct->setUnit($record->getUnit());
-        $marketProduct->setPriceAvgPrevious($record->getPriceAvgPrevious());
+        $marketProduct->setPriceDifferencePrevious($record->getPriceDifferencePrevious());
         $marketProduct->setPriceAvg($record->getPriceAvg());
         $marketProduct->setPriceDifference($record->getPriceDifference());
         $marketProduct->setPriceMin($record->getPriceMin());
         $marketProduct->setPriceMax($record->getPriceMax());
-
-        $this->_em->persist($marketProduct);
-        $this->_em->flush();
+        $marketProduct->setActive();
 
         return $marketProduct;
     }

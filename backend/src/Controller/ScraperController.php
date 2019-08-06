@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\BusinessLogic\Importer\Exception\ImporterException;
 use App\BusinessLogic\Importer\Service\ImportService;
 use App\Entity\ImporterLog;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,21 +18,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class ScraperController extends AbstractController
 {
     /**
-     * @Route("/scraper", name="sraper")
+     * @Route("/scraper", name="scraper")
      *
-     * @param ImportService $importService
+     * @param ImportService          $importService
+     * @param EntityManagerInterface $entityManager
+     *
      * @return JsonResponse
      *
+     * @throws ImporterException
      */
-    public function index(ImportService $importService, EntityManagerInterface $entityManager): JsonResponse
+    public function index(ImportService $importService, EntityManagerInterface $entityManager): Response
     {
+        $importStartDate = new DateTime();
         $importerLogs = $entityManager->getRepository(ImporterLog::class)->getNotImported();
-
         foreach ($importerLogs as $importerLog) {
-            $importService->import($importerLog);
+            $importService->import($importerLog, $importStartDate);
         }
 
-        return new JsonResponse(['status' => 'success']);
+        return $this->render('scraper/index.html.twig');
     }
 
     /**

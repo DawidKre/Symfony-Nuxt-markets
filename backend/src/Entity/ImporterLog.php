@@ -68,13 +68,21 @@ class ImporterLog extends AbstractBaseEntity
     }
 
     /**
-     * @param bool $success
-     *
      * @return ImporterLog
      */
-    public function setSuccess(bool $success): self
+    public function setSuccess(): self
     {
-        $this->success = $success;
+        $this->success = true;
+
+        return $this;
+    }
+
+    /**
+     * @return ImporterLog
+     */
+    public function setFailed(): self
+    {
+        $this->success = false;
 
         return $this;
     }
