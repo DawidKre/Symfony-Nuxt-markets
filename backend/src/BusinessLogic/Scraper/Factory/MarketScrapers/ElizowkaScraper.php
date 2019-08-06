@@ -96,9 +96,9 @@ class ElizowkaScraper implements ScrapeMarketInterface
 
             return $this->records;
         } catch (MarketNotScrapedException $e) {
-            throw new MarketNotScrapedException($e->getMessage(), 0, $e);
+            throw new MarketNotScrapedException($e->getMessage(), $e->getCode(), $e);
         } catch (Exception $e) {
-            throw new ScraperException($e->getMessage(), 0, $e);
+            throw new ScraperException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -110,7 +110,7 @@ class ElizowkaScraper implements ScrapeMarketInterface
     private function checkStatus(string $mainNodeText): void
     {
         $checkStatus = $this->checkerService->checkMarketPrices($this->market, $mainNodeText);
-        if (!$checkStatus) {
+        if ($checkStatus) {
             throw new MarketNotScrapedException('Changes not found');
         }
 
@@ -163,7 +163,7 @@ class ElizowkaScraper implements ScrapeMarketInterface
         $record->setPriceMax((float) $tr->childNodes[4]->textContent);
         $record->setPriceAvg((float) $tr->childNodes[5]->textContent);
         $record->setPriceDifference((float) $tr->childNodes[6]->textContent);
-        $record->setPriceAvgPrevious((float) $tr->childNodes[7]->textContent);
+        $record->setPriceDifferencePrevious((float) $tr->childNodes[7]->textContent);
         $record->setPriceStartDate($priceStartDate);
         $record->setScrapeDate((new DateTime())->format('Y-m-d H:i:s'));
 

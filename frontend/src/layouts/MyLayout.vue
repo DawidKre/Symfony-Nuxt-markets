@@ -1,17 +1,20 @@
 <template>
   <div>
-    <q-layout view="hHh lpR fff" v-if="1 === 2">
+    <q-layout
+      v-if="1 === 1"
+      view="hHh lpR fff"
+    >
       <q-header
         class="bg-primary text-white"
         elevated
       >
         <q-toolbar>
           <q-btn
-            @click="left = !left"
             dense
             flat
             icon="menu"
             round
+            @click="left = !left"
           />
           <q-toolbar-title>
             <q-avatar>
@@ -22,22 +25,22 @@
         </q-toolbar>
       </q-header>
       <q-drawer
+        v-model="drawer"
         :breakpoint="500"
         :width="200"
         bordered
         content-class="bg-grey-3"
         show-if-above
-        v-model="drawer"
       >
         <q-scroll-area class="fit">
           <q-list
-            :key="index"
             v-for="(menuItem, index) in menuList"
+            :key="index"
           >
             <q-item
+              v-ripple
               :active="menuItem.label === 'Outbox'"
               clickable
-              v-ripple
             >
               <q-item-section avatar>
                 <q-icon :name="menuItem.icon" />
@@ -53,7 +56,12 @@
         <router-view />
       </q-page-container>
     </q-layout>
-    <img  class="vertical-middle absolute-center" style="width: 50%" src="~assets/soon.jpg" v-else>
+    <img
+      v-else
+      class="vertical-middle absolute-center"
+      style="width: 50%"
+      src="~assets/soon.jpg"
+    >
   </div>
 </template>
 

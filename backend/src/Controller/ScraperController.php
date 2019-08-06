@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
-use App\BusinessLogic\Scraper\Exception\MarketNotScrapedException;
-use App\BusinessLogic\Scraper\Exception\ScraperException;
-use App\BusinessLogic\Scraper\Factory\ScrapeMarketFactory;
-use App\Entity\Market;
+use App\BusinessLogic\Importer\Exception\ImporterException;
+use App\BusinessLogic\Importer\Service\ImportService;
+use App\Entity\ImporterLog;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,24 +18,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class ScraperController extends AbstractController
 {
     /**
-     * @Route("/scraper", name="sraper")
+     * @Route("/scraper", name="scraper")
      *
-     * @param ScrapeMarketFactory $scrapeMarketFactory
+     * @param ImportService          $importService
+     * @param EntityManagerInterface $entityManager
      *
      * @return JsonResponse
      *
-     * @throws MarketNotScrapedException
-     * @throws ScraperException
+     * @throws ImporterException
      */
-    public function index(ScrapeMarketFactory $scrapeMarketFactory): JsonResponse
+    public function index(ImportService $importService, EntityManagerInterface $entityManager): Response
     {
-        $markets = $this->getDoctrine()->getRepository(Market::class)->findAll();
-
-        foreach ($markets as $market) {
-            $scrapeMarketFactory->createScraper($market)->scrapeMarket();
+        $importStartDate = new DateTime();
+        $importerLogs = $entityManager->getRepository(ImporterLog::class)->getNotImported();
+        foreach ($importerLogs as $importerLog) {
+            $importService->import($importerLog, $importStartDate);
         }
 
-        return new JsonResponse(['status' => 'success']);
+        return $this->render('scraper/index.html.twig');
     }
 
     /**

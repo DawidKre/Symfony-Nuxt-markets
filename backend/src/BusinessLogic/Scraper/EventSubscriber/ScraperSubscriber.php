@@ -2,6 +2,7 @@
 
 namespace App\BusinessLogic\Scraper\EventSubscriber;
 
+use App\BusinessLogic\Importer\Event\StartImportingScrapedMarketsEvent;
 use App\BusinessLogic\Scraper\Event\MarketNotScrapedEvent;
 use App\BusinessLogic\Scraper\Event\MarketScrapedEvent;
 use App\BusinessLogic\Scraper\Event\MarketScrapingErrorEvent;
@@ -15,12 +16,13 @@ use App\Entity\Market;
 use Http\Client\Exception;
 use League\Csv\CannotInsertRecord;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class CreateMarketScraperCheckSubscriber.
+ * Class ScraperSubscriber.
  */
-class MarketScrapedSubscriber implements EventSubscriberInterface
+class ScraperSubscriber implements EventSubscriberInterface
 {
     /** @var SlackService */
     private $slackService;
@@ -37,20 +39,30 @@ class MarketScrapedSubscriber implements EventSubscriberInterface
     /** @var string */
     private $message;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
      * MarketScrapedSubscriber constructor.
      *
-     * @param SlackService      $slackService
-     * @param ScraperLogService $scraperLogService
-     * @param CsvWriterService  $csvService
-     * @param LoggerInterface   $scraperLogger
+     * @param SlackService             $slackService
+     * @param ScraperLogService        $scraperLogService
+     * @param CsvWriterService         $csvService
+     * @param LoggerInterface          $scraperLogger
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(SlackService $slackService, ScraperLogService $scraperLogService, CsvWriterService $csvService, LoggerInterface $scraperLogger)
-    {
+    public function __construct(
+        SlackService $slackService,
+        ScraperLogService $scraperLogService,
+        CsvWriterService $csvService,
+        LoggerInterface $scraperLogger,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->slackService = $slackService;
         $this->scraperLogService = $scraperLogService;
         $this->csvService = $csvService;
         $this->scraperLogger = $scraperLogger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -83,6 +95,7 @@ class MarketScrapedSubscriber implements EventSubscriberInterface
     {
         $this->message = ScrapingStatus::SCRAPER_FINISHED_SCRAPING;
         $this->scrapingProcessChanged();
+        $this->eventDispatcher->dispatch(new StartImportingScrapedMarketsEvent());
     }
 
     /**
@@ -118,7 +131,6 @@ class MarketScrapedSubscriber implements EventSubscriberInterface
         $this->setMessage($event->getMarket()->getName(), $event->getErrorMessage());
         $this->marketScrapingError($event->getMarket(), $event->getErrorMessage());
     }
-
 
     /**
      * @throws Exception

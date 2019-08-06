@@ -2,8 +2,13 @@
 
 namespace App\Repository;
 
+use App\BusinessLogic\Scraper\Model\Record;
+use App\Entity\Category;
+use App\Entity\Market;
 use App\Entity\MarketProduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -16,6 +21,7 @@ class MarketProductRepository extends ServiceEntityRepository
 {
     /**
      * MarketProductRepository constructor.
+     *
      * @param RegistryInterface $registry
      */
     public function __construct(RegistryInterface $registry)
@@ -27,7 +33,6 @@ class MarketProductRepository extends ServiceEntityRepository
      * @param string $name
      *
      * @return MarketProduct
-     *
      */
     public function findOneByName(string $name): ?MarketProduct
     {
@@ -35,14 +40,34 @@ class MarketProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param string $name
+     * @param Record $record
      *
-     * @return MarketProduct|null
+     * @return MarketProduct
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function createByName(string $name): ?MarketProduct
+    public function createNewMarketProduct(Record $record): MarketProduct
     {
+        $market = $this->_em->getRepository(Market::class)->findOneBy(['name' => $record->getMarket()]);
+        $category = $this->_em->getRepository(Category::class)->findOneBy(['name' => $record->getCategory()]);
+
+        if (!$category) {
+            $category = $this->_em->getRepository(Category::class)->createNewCategoryByName($record->getCategory());
+        }
         $marketProduct = new MarketProduct();
-        $marketProduct->setName($name);
+        $marketProduct->setMarket($market);
+        $marketProduct->setCategory($category);
+        $marketProduct->setName($record->getName());
+        $marketProduct->setAmount($record->getAmount());
+        $marketProduct->setQuantity($record->getQuantity());
+        $marketProduct->setUnit($record->getUnit());
+        $marketProduct->setPriceDifferencePrevious($record->getPriceDifferencePrevious());
+        $marketProduct->setPriceAvg($record->getPriceAvg());
+        $marketProduct->setPriceDifference($record->getPriceDifference());
+        $marketProduct->setPriceMin($record->getPriceMin());
+        $marketProduct->setPriceMax($record->getPriceMax());
+        $marketProduct->setActive();
 
         return $marketProduct;
     }
