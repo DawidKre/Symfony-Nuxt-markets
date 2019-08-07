@@ -102,13 +102,6 @@ class MarketProduct extends AbstractBaseEntity
     private $priceAvgPrevious;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
-     *
-     * @var float
-     */
-    private $priceDifferencePrevious;
-
-    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Market", inversedBy="marketProducts")
      * @ORM\JoinColumn(nullable=false)
      *
@@ -517,26 +510,6 @@ class MarketProduct extends AbstractBaseEntity
     public function setPriceMaxPrevious(float $priceMaxPrevious): MarketProduct
     {
         $this->priceMaxPrevious = $priceMaxPrevious;
-
-        return $this;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPriceDifferencePrevious(): float
-    {
-        return $this->priceDifferencePrevious;
-    }
-
-    /**
-     * @param float $priceDifferencePrevious
-     *
-     * @return MarketProduct
-     */
-    public function setPriceDifferencePrevious(float $priceDifferencePrevious): MarketProduct
-    {
-        $this->priceDifferencePrevious = $priceDifferencePrevious;
 
         return $this;
     }

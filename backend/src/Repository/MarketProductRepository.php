@@ -62,8 +62,8 @@ class MarketProductRepository extends ServiceEntityRepository
         $marketProduct->setAmount($record->getAmount());
         $marketProduct->setQuantity($record->getQuantity());
         $marketProduct->setUnit($record->getUnit());
-        $marketProduct->setPriceDifferencePrevious($record->getPriceDifferencePrevious());
         $marketProduct->setPriceAvg($record->getPriceAvg());
+        $marketProduct->setPriceAvgPrevious($record->getPriceAvgPrevious());
         $marketProduct->setPriceDifference($record->getPriceDifference());
         $marketProduct->setPriceMin($record->getPriceMin());
         $marketProduct->setPriceMax($record->getPriceMax());
