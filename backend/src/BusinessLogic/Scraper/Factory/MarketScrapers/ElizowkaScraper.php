@@ -162,8 +162,8 @@ class ElizowkaScraper implements ScrapeMarketInterface
         $record->setPriceMin((float) $tr->childNodes[3]->textContent);
         $record->setPriceMax((float) $tr->childNodes[4]->textContent);
         $record->setPriceAvg((float) $tr->childNodes[5]->textContent);
-        $record->setPriceDifference((float) $tr->childNodes[6]->textContent);
-        $record->setPriceDifferencePrevious((float) $tr->childNodes[7]->textContent);
+        $record->setPriceAvgPrevious((float) $tr->childNodes[6]->textContent);
+        $record->setPriceDifference((float) $tr->childNodes[7]->textContent);
         $record->setPriceStartDate($priceStartDate);
         $record->setScrapeDate((new DateTime())->format('Y-m-d H:i:s'));
 

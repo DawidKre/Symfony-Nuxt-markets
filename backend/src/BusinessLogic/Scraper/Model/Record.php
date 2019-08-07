@@ -35,10 +35,10 @@ class Record implements RecordInterface
     private $priceAvg;
 
     /** @var string */
-    private $priceDifference;
+    private $priceAvgPrevious;
 
     /** @var string */
-    private $priceDifferencePrevious;
+    private $priceDifference;
 
     /** @var string */
     private $scrapeDate;
@@ -147,11 +147,11 @@ class Record implements RecordInterface
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getAmount(): int
+    public function getAmount(): float
     {
-        return (int) $this->amount;
+        return (float) $this->amount;
     }
 
     /**
@@ -229,17 +229,17 @@ class Record implements RecordInterface
     /**
      * @return float
      */
-    public function getPriceDifferencePrevious(): float
+    public function getPriceAvgPrevious(): float
     {
-        return (float) $this->priceDifferencePrevious;
+        return (float) $this->priceAvgPrevious;
     }
 
     /**
-     * @param float $priceDifferencePrevious
+     * @param float $priceAvgPrevious
      */
-    public function setPriceDifferencePrevious(float $priceDifferencePrevious): void
+    public function setPriceAvgPrevious(float $priceAvgPrevious): void
     {
-        $this->priceDifferencePrevious = $priceDifferencePrevious;
+        $this->priceAvgPrevious = $priceAvgPrevious;
     }
 
     /**

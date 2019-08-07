@@ -74,10 +74,9 @@ class MarketProductService
         $marketProduct->setQuantity($record->getQuantity());
         $marketProduct->setUnit($record->getUnit());
 
-        $marketProduct->setPriceDifferencePrevious($record->getPriceDifferencePrevious());
         $marketProduct->setPriceMinPrevious($marketProduct->getPriceMin());
         $marketProduct->setPriceMaxPrevious($marketProduct->getPriceMax());
-        $marketProduct->setPriceAvgPrevious($marketProduct->getPriceAvg());
+        $marketProduct->setPriceAvgPrevious($marketProduct->getPriceAvgP());
 
         $marketProduct->setPriceAvg($record->getPriceAvg());
         $marketProduct->setPriceDifference($record->getPriceDifference());

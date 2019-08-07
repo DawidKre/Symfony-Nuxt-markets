@@ -90,7 +90,8 @@ class ImportService
                 $marketProduct = $marketProducts->filter(static function (MarketProduct $marketProduct) use ($record) {
                     return
                         $marketProduct->getName() === $record->getName() &&
-                        $marketProduct->getUnit() === $record->getUnit();
+                        $marketProduct->getUnit() === $record->getUnit() &&
+                        $marketProduct->getAmount() === $record->getAmount();
                 })->first();
 
                 if ($marketProduct) {
