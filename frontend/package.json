@@ -16,11 +16,17 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "lodash": "^4.17.13",
-    "quasar": "^1.0.0"
+    "quasar": "^1.0.0",
+    "vue-router": "^3.1.2",
+    "vuex": "^3.1.1"
   },
   "devDependencies": {
     "@quasar/app": "^1.0.0",
+    "@quasar/quasar-app-extension-dotenv": "^1.0.0-beta.10",
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.10.0",

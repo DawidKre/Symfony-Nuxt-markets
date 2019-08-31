@@ -39,16 +39,19 @@ module.exports = function (ctx) {
         'QDrawer',
         'QPageContainer',
         'QPage',
+        'QSelect',
         'QSeparator',
+        'QSpace',
         'QToolbar',
         'QToolbarTitle',
         'QBtn',
         'QIcon',
+        'QInput',
         'QList',
         'QItem',
         'QItemSection',
         'QItemLabel',
-        'QScrollArea',
+        'QScrollArea'
       ],
 
       directives: [
@@ -57,7 +60,7 @@ module.exports = function (ctx) {
 
       // Quasar plugins
       plugins: [
-        'Notify'
+        'Notify',
       ]
     },
 

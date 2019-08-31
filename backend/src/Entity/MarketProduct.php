@@ -475,9 +475,9 @@ class MarketProduct extends AbstractBaseEntity
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getPriceMinPrevious(): float
+    public function getPriceMinPrevious(): ?float
     {
         return $this->priceMinPrevious;
     }
@@ -495,9 +495,9 @@ class MarketProduct extends AbstractBaseEntity
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getPriceMaxPrevious(): float
+    public function getPriceMaxPrevious(): ?float
     {
         return $this->priceMaxPrevious;
     }

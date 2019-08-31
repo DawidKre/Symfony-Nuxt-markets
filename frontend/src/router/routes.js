@@ -1,11 +1,15 @@
+import marketproductRoutes from './marketproduct'
+
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MyLayout.vue'),
+    component: () => import('layouts/Main.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
+      { name: 'dashboard', path: '/', component: () => import('pages/Dashboard.vue') },
+      { name: 'actualPrices', path: '/aktualne-ceny', component: () => import('pages/ActualPrices.vue') }
     ]
-  }
+  },
+  ...marketproductRoutes
 ]
 
 // Always leave this as last one
