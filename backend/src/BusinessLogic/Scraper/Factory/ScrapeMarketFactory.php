@@ -2,13 +2,12 @@
 
 namespace App\BusinessLogic\Scraper\Factory;
 
+use App\BusinessLogic\Scraper\Exception\MarketNotFoundException;
 use App\BusinessLogic\Scraper\Factory\MarketScrapers\ElizowkaScraper;
 use App\BusinessLogic\Scraper\Model\MarketNameType;
 use App\BusinessLogic\Scraper\Service\CheckerService;
 use App\BusinessLogic\SharedLogic\Service\CrawlerService;
-use App\BusinessLogic\SharedLogic\Service\CsvWriterService;
 use App\Entity\Market;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class ScrapeMarketFactory.
@@ -35,6 +34,8 @@ class ScrapeMarketFactory
      * @param Market $market
      *
      * @return ScrapeMarketInterface
+     *
+     * @throws MarketNotFoundException
      */
     public function createScraper(Market $market): ScrapeMarketInterface
     {
@@ -45,5 +46,7 @@ class ScrapeMarketFactory
             case MarketNameType::BRONISZE_MARKET:
                 return new ElizowkaScraper($market, $this->crawlerService, $this->checkerService);
         }
+
+        throw new MarketNotFoundException();
     }
 }
