@@ -6,7 +6,8 @@ module.exports = function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     boot: [
-      'axios'
+      'axios',
+      ctx.mode.capacitor ? 'google-analytics' : ''
     ],
 
     css: [

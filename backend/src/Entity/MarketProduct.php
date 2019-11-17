@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\BusinessLogic\SharedLogic\Model\EnumTypeName;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +15,49 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource()
  *
  * @ORM\Entity(repositoryClass="App\Repository\MarketProductRepository")
+ *
+ * @ApiResource(
+ *     attributes={
+ *          "order"={"name":"ASC"},
+ *          "pagination_client_items_per_page"=true,
+ *          "maximum_items_per_page": 100
+ *     },
+ *     itemOperations={
+ *         "GET"={
+ *              "normalization_context"={
+ *                  "groups"={"get"}
+ *              }
+ *          }
+ *      },
+ *     collectionOperations={
+ *         "GET"={
+ *              "normalization_context"={
+ *                  "groups"={"read"}
+ *              }
+ *          }
+ *      },
+ *     normalizationContext={
+ *         "groups"={"read"}
+ *     }
+ * )
+ * @ApiFilter(
+ *     SearchFilter::class,
+ *     properties={
+ *          "name":"exact",
+ *     }
+ * )
+ * @ApiFilter(
+ *     OrderFilter::class,
+ *     properties={
+ *          "name",
+ *          "unit",
+ *          "priceMin",
+ *          "priceMax",
+ *          "priceAvg",
+ *          "priceAvgPrevious",
+ *          "priceDifference"
+ *      }
+ * )
  */
 class MarketProduct extends AbstractBaseEntity
 {
@@ -83,14 +129,14 @@ class MarketProduct extends AbstractBaseEntity
     /**
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      *
-     * @var float
+     * @var float|null
      */
     private $priceMinPrevious;
 
     /**
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      *
-     * @var float
+     * @var float|null
      */
     private $priceMaxPrevious;
 

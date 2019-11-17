@@ -1,19 +1,24 @@
 <template>
   <div>
     <div class="row q-pb-sm">
-      <div class="col-md-4 offset-md-8 col-lg-3 offset-lg-9 col-sm-6 offset-sm-6 col-xs-12">
-        <q-input
-          v-model="filter"
-          standout="bg-teal text-white"
-          clearable
-          clear-icon="clear"
-          debounce="300"
-          label="Szukaj"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
+      <div class="col-md-8 col-lg-9 col-sm-6 col-xs-12">
+        <h4>Aktualne ceny</h4>
+      </div>
+      <div class="col-md-4 col-lg-3 col-sm-6 col-xs-12">
+        <div class="q-mt-lg">
+          <q-input
+            v-model="filter"
+            standout="bg-teal text-white"
+            clearable
+            clear-icon="clear"
+            debounce="300"
+            label="Szukaj"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
       </div>
     </div>
     <q-table
@@ -54,26 +59,30 @@
         :disabled="!view['hydra:previous']"
         type="button"
         class="btn btn-basic btn-sm"
-        @click="getPage(view['hydra:first'])">First</button>
-      &nbsp;
+        @click="getPage(view['hydra:first'])">
+        First
+      </button>
       <button
         :disabled="!view['hydra:previous']"
         type="button"
         class="btn btn-basic btn-sm"
-        @click="getPage(view['hydra:previous'])">Previous</button>
-      &nbsp;
+        @click="getPage(view['hydra:previous'])">
+        Previous
+      </button>
       <button
         :disabled="!view['hydra:next']"
         type="button"
         class="btn btn-basic btn-sm"
-        @click="getPage(view['hydra:next'])">Next</button>
-      &nbsp;
+        @click="getPage(view['hydra:next'])">
+        Next
+      </button>
       <button
         :disabled="!view['hydra:last']"
         type="button"
         class="btn btn-basic btn-sm"
-        @click="getPage(view['hydra:last'])">Last</button>
-      &nbsp;
+        @click="getPage(view['hydra:last'])">
+        Last
+      </button>
     </span>
   </div>
 </template>
