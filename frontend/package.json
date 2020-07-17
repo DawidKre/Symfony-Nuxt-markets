@@ -19,7 +19,7 @@
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "quasar": "^1.0.0",
     "vue-analytics": "^5.18.0",
     "vue-router": "^3.1.2",
